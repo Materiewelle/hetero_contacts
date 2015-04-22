@@ -79,7 +79,9 @@ void time_evolution::solve() {
 
     // build constant part of Hamiltonian
     cx_mat H_eff(2*d::N_x, 2*d::N_x);
+    H_eff.fill(0);
     H_eff.diag(+1) = conv_to<cx_vec>::from(d::t_vec);
+    H_eff.diag( 0) = conv_to<cx_vec>::from(d::t_diag);
     H_eff.diag(-1) = conv_to<cx_vec>::from(d::t_vec);
 
     anderson mr_neo;
