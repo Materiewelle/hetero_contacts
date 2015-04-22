@@ -43,7 +43,7 @@ static inline arma::cx_vec green_col(const potential & phi, double E, arma::cx_d
     return inverse_col<source>(t_vec_neg, D);
 }
 
-static inline arma::mat lDOS(const potential & phi, int N_grid, arma::vec & E) {
+static inline arma::mat get_lDOS(const potential & phi, int N_grid, arma::vec & E) {
     using namespace arma;
     using namespace std::complex_literals;
 
@@ -87,7 +87,7 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
     gp << "unset colorbox\n";
 
     arma::vec E;
-    arma::mat lDOS = ldos(phi, N_grid, E);
+    arma::mat lDOS = get_lDOS(phi, N_grid, E);
     gp.set_background(d::x, E, arma::log(lDOS));
 
     gp.add(d::x, phi.data + 0.5 * d::E_g);

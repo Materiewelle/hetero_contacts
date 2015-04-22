@@ -27,6 +27,7 @@ int main() {
 //    }
 //    std::fill(begin(te.V) + 50, end(te.V), voltage{0.0, 0.5, 0.8});
 
+    plot_ldos(potential({0, 0.3, 0.6}), 1000);
 
 
     std::fill(begin(te.V), end(te.V), voltage{0.0, -0.3, 0.8});

@@ -35,7 +35,7 @@ namespace d {
     static constexpr int N_c    = round(l_c / dx);                                  // # of lattice points in channel
     static constexpr int N_d    = round(l_d / dx);                                  // # of lattice points in drain
     static constexpr auto N_x   = N_s + N_c + N_d;                                  // total # of lattice points
-    static const     auto x     = arma::linspace(0.5 * dx, l - 0.5 * dx, N_x);      // lattice points
+    static const arma::vec x    = arma::linspace(0.5 * dx, l - 0.5 * dx, N_x);      // lattice points
 
     // ranges
     static const     auto s     = arma::span(0, N_s - 1);
