@@ -10,72 +10,91 @@
 namespace d {
 
     // material properties
-    static constexpr double eps_c = 11.2;                                         // relative permittivity of channel
+    static constexpr double eps_g = 11.2;                                         // relative permittivity of channel
     static constexpr double eps_o = 12;                                           // relative permittivity of oxide
     static constexpr double E_g   = 0.6;                                          // bandgap
     static constexpr double m_eff = 0.2 * c::m_e;                                 // effective mass in conduction band
     static constexpr double F_s   = -(E_g/2 + 0.0151);                            // Fermi level in source
-    static constexpr double F_c   = 0;                                            // Fermi level in channel
+    static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.0151);                            // Fermi level in drain
 
     // geometry (everything in nm)
-    static constexpr double l_c   = 10;                                           // channel length
-    static constexpr double d_c   = 2;                                            // channel thickness
+    static constexpr double l_sc  = 10;                                           // source contact length
+    static constexpr double l_s   = 10;                                           // source length
+    static constexpr double l_g   = 10;                                           // gate length
+    static constexpr double l_d   = 10;                                           // drain length
+    static constexpr double l_dc  = 10;                                           // drain contactlength
+    static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length
+    static constexpr double d_g   = 2;                                            // channel thickness
     static constexpr double d_o   = 0.8;                                          // oxide thickness
-    static constexpr double lam_c = sqrt(eps_c*d_c*d_c/8/eps_o*log(1+2*d_o/d_c)); // scr. length in channel
-    static constexpr double lam_s = 1.0 < lam_c ? 1.0 : lam_c;                    // scr. length in source
-    static constexpr double lam_d = 1.0 < lam_c ? 1.0 : lam_c;                    // scr. length in drain
-    static constexpr double l_s   = 30 * lam_s;                                   // source length
-    static constexpr double l_d   = 30 * lam_d;                                   // drain length
-    static constexpr double l     = l_s + l_c + l_d;                              // device length
+    static constexpr double lam_g = sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
+    static constexpr double lam_s = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
+    static constexpr double lam_d = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
 
     // lattice
     static constexpr double dx    = 0.1;                                          // lattice constant
-    static constexpr int    N_s   = round(l_s / dx);                              // # of lattice points in source
-    static constexpr int    N_c   = round(l_c / dx);                              // # of lattice points in channel
-    static constexpr int    N_d   = round(l_d / dx);                              // # of lattice points in drain
-    static constexpr int    N_x   = N_s + N_c + N_d;                              // total # of lattice points
+    static constexpr int    N_sc  = round(l_sc / dx);                             // # of points in source contact
+    static constexpr int    N_s   = round(l_s / dx);                              // # of points in source
+    static constexpr int    N_g   = round(l_g / dx);                              // # of points in gate
+    static constexpr int    N_d   = round(l_d / dx);                              // # of points in drain
+    static constexpr int    N_dc  = round(l_dc / dx);                             // # of points in drain contact
+    static constexpr int    N_x   = N_sc + N_s + N_g + N_d + N_dc;                // total # of points
     static const arma::vec  x     = arma::linspace(0.5 * dx, l - 0.5 * dx, N_x);  // lattice points
 
     // ranges
-    static const     auto   s     = arma::span(0, N_s - 1);                         // source area
-    static const     auto   c     = arma::span(N_s, N_s + N_c - 1);                 // channel area
-    static const     auto   d     = arma::span(N_s + N_c, N_s + N_c + N_d - 1);     // drain area
+    static const arma::span sc    = arma::span(0, N_sc - 1);                      // source contact area
+    static const arma::span s     = arma::span(sc.b + 1, sc.b + N_s);             // source area
+    static const arma::span g     = arma::span( s.b + 1,  s.b + N_g);             // gate area
+    static const arma::span d     = arma::span( g.b + 1,  g.b + N_d);             // drain area
+    static const arma::span dc    = arma::span( d.b + 1,  d.b + N_dc);            // drain contact area
+    static const arma::span sc2   = arma::span(sc.a * 2, sc.b * 2 + 1);           // source contact area twice
+    static const arma::span s2    = arma::span( s.a * 2,  s.b * 2 + 1);           // source area twice
+    static const arma::span g2    = arma::span( g.a * 2,  g.b * 2 + 1);           // gate area twice
+    static const arma::span d2    = arma::span( d.a * 2,  d.b * 2 + 1);           // drain area twice
+    static const arma::span dc2   = arma::span(dc.a * 2, dc.b * 2 + 1);           // drain contact area twice
 
     // hopping parameters
-    static constexpr double t1    = 0.25 * E_g * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
-    static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
+    static constexpr double t1    = 0.25 * E_g * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
+    static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
 
     // contacts
     static constexpr double E_gc  = 0.1;
     static constexpr double m_efc = 0.1 * c::m_e;
-    static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
-    static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
+    static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
+    static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
     static constexpr double tcn   = -0.2;
-    static constexpr int    Ncs   = N_s / 2;
-    static constexpr int    Ncd   = N_d / 2;
 
-    // off diagonal of hamiltonian
-    template<int N>
-    inline arma::vec create_t_vec(double e1, double e2) {
-        arma::vec ret(N * 2 - 1);
-        ret.imbue([&]() {
-            static bool b = true;
-            if (b) {
-                b = false;
-                return e1;
-            } else {
-                b = true;
-                return e2;
-            }
-        });
+    // constant parts of hamiltonian
+    inline arma::vec create_t_vec() {
+        arma::vec ret(N_x * 2 - 1);
+        bool b = true;
+        for (int i = sc2.a; i < sc2.b; ++i) {
+            ret(i) = b ? tc1 : tc2;
+            b = !b;
+        }
+        ret(sc2.b) = tcc;
+        b = true;
+        for (int i = s2.a; i < d2.b; ++i) {
+            ret(i) = b ? t1 : t2;
+            b = !b;
+        }
+        ret(d2.b) = tcc;
+        b = true;
+        for (int i = dc2.a; i < dc2.b; ++i) {
+            ret(i) = b ? tc1 : tc2;
+            b = !b;
+        }
         return ret;
     }
-    static const auto t_vec_cs = create_t_vec<Ncs>(tc1, tc2);
-    static const auto t_vec_g  = create_t_vec<N_x - Ncs - Ncd>(t1, t2);
-    static const auto t_vec_cd = create_t_vec<Ncd>(tc1, tc2);
-    static const auto t_vec = arma::join_vert(t_vec_cs, t_vec_g, t_vec_cd)
+    inline arma::vec create_t_diag() {
+        arma::vec ret(N_x * 2);
+        ret(sc2).fill(tcn);
+        ret(dc2).fill(tcn);
+    }
+
+    static const auto t_vec = create_t_vec();
+    static const auto t_diag = create_t_diag();
 
     // integration parameters
     static constexpr double E_min = -1.5;
@@ -91,24 +110,24 @@ namespace d {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
             ret(0) = (1 - fermi(E, F_s)) * dos;
-            ret(1) = (1 - fermi(E, F_c)) * dos;
+            ret(1) = (1 - fermi(E, F_g)) * dos;
             ret(2) = (1 - fermi(E, F_d)) * dos;
             return ret;
         }, linspace(E_min , - 0.5 * E_g, 100), rel_tol, std::numeric_limits<double>::epsilon(), x0, w0) + integral<3>([] (double E) {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
             ret(0) = fermi(E, F_s) * dos;
-            ret(1) = fermi(E, F_c) * dos;
+            ret(1) = fermi(E, F_g) * dos;
             ret(2) = fermi(E, F_d) * dos;
             return ret;
         }, linspace(0.5 * E_g, E_max, 100), rel_tol, std::numeric_limits<double>::epsilon(), x1, w1);
 
         vec ret(N_x);
         ret(s).fill(n0(0));
-        ret(c).fill(n0(1));
+        ret(g).fill(n0(1));
         ret(d).fill(n0(2));
 
-        ret *= 16 * c::e / M_PI / M_PI / dx / d_c / d_c;
+        ret *= 16 * c::e / M_PI / M_PI / dx / d_g / d_g;
 
         return ret;
     }
