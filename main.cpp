@@ -33,21 +33,17 @@ int main() {
         self_energy_test(phi, E(i), test_s(i), test_d(i));
     }
 
-    gnuplot gpsa;
-    gpsa.add(alt_s);
-    gpsa << "set title \"alt source\"\n";
+    gnuplot gps;
+    gps.add(alt_s);
+    gps.add(test_s);
+    gps << "set title \"source\"\n";
+    gps.plot();
 
-    gnuplot gpst;
-    gpst.add(test_s);
-    gpst << "set title \"test source\"\n";
-
-    gnuplot gpda;
-    gpda.add(alt_d);
-    gpda << "set title \"alt drain\"\n";
-
-    gnuplot gpdt;
-    gpdt.add(test_d);
-    gpdt << "set title \"test drain\"\n";
+    gnuplot gpd;
+    gpd.add(alt_d);
+    gpd.add(test_d);
+    gpd << "set title \"drain\"\n";
+    gpd.plot();
 
 
 

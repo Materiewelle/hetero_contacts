@@ -155,7 +155,7 @@ void gnuplot::plot() {
         if (data.size() > 0) {
             *this << "p ";
             for(unsigned i = 0; i < data.size(); ++i) {
-                *this << "\"-\" w l notitle" << i + 1 << "\"";
+                *this << "\"-\" w l t \"line " << i + 1 << "\"";
                 if (i < data.size() - 1) {
                     *this << ", ";
                 }
