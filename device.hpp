@@ -51,6 +51,7 @@ namespace d {
     static constexpr double m_efc = 0.1 * c::m_e;
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
+    static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
     static constexpr double tcn   = -0.2;
 
     // off diagonal of hamiltonian

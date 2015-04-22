@@ -9,6 +9,25 @@
 #include "inverse.hpp"
 #include "potential.hpp"
 
+static inline void self_energy_test(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {
+    using namespace arma;
+    using namespace std;
+
+    // kinetic energy in source and drain
+    auto E_s = E - phi.s();
+    auto E_d = E - phi.d();
+
+    // shortcuts
+    static constexpr double t12 = d::t1 * d::t1;
+    static constexpr double t22 = d::t2 * d::t2;
+
+    // self energy
+    Sigma_s = E_s * E_s - t12 - t22;
+    Sigma_s = 0.5 * (E_s * E_s - t12 + t22 + sqrt(Sigma_s * Sigma_s + - 4 * t12 * t22)) / E_s;
+    Sigma_d = E_d * E_d - t12 - t22;
+    Sigma_d = 0.5 * (E_d * E_d - t12 + t22 + sqrt(Sigma_d * Sigma_d + - 4 * t12 * t22)) / E_d;
+}
+
 static inline void self_energy(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {
     using namespace arma;
     using namespace std;
