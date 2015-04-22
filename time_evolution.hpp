@@ -221,10 +221,12 @@ void time_evolution::calculate_q() {
 
     // get q values dependent on potential in lead
     auto get_q = [&] (double phi0) {
+        phi0 += d::tcc; // denk an the energy shift
+
         // shortcuts
-        static constexpr auto t1 = d::t1;
+        static constexpr auto t1 = d::tc1;
         static constexpr auto t12 = t1 * t1;
-        static constexpr auto t2 = d::t2;
+        static constexpr auto t2 = d::tc2;
         static constexpr auto t22 = t2 * t2;
         static constexpr auto g = t::g;
         static constexpr auto g2 = g * g;
@@ -235,7 +237,7 @@ void time_evolution::calculate_q() {
         vector<mat22> p(t::N_t + 3);
 
         // hamiltonian in lead
-        mat22 h = { phi0, t1, t1, phi0 };
+        mat22 h = { phi0, t1, t1, phi0};
 
         // coupling hamiltonian
         mat22 Vau = { 0, t2, 0, 0 };
