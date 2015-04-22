@@ -26,6 +26,10 @@ static inline void self_energy_test(const potential & phi, double E, arma::cx_do
     Sigma_s = 0.5 * (E_s * E_s - t12 + t22 + sqrt(Sigma_s * Sigma_s + - 4 * t12 * t22)) / E_s;
     Sigma_d = E_d * E_d - t12 - t22;
     Sigma_d = 0.5 * (E_d * E_d - t12 + t22 + sqrt(Sigma_d * Sigma_d + - 4 * t12 * t22)) / E_d;
+
+    // imaginary part must be negative
+    Sigma_s.imag(-std::abs(Sigma_s.imag()));
+    Sigma_d.imag(-std::abs(Sigma_d.imag()));
 }
 
 static inline void self_energy(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {

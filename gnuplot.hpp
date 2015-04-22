@@ -27,10 +27,11 @@ public:
     inline void add(const std::pair<arma::vec, arma::vec> & xy);
     inline void add(const arma::vec & x, const arma::vec & y);
     inline void add(const arma::vec & y);
-
     inline void add(const std::pair<arma::vec, arma::cx_vec> & xy);
     inline void add(const arma::vec & x, const arma::cx_vec & y);
     inline void add(const arma::cx_vec & y);
+
+    inline void add(const std::string title);
 
     inline void set_background(const std::tuple<arma::vec, arma::vec, arma::mat> & xyz);
     inline void set_background(const arma::vec & x, const arma::vec & y, const arma::mat & z);
@@ -109,6 +110,10 @@ void gnuplot::add(const arma::vec & x, const arma::cx_vec & y) {
 void gnuplot::add(const arma::cx_vec & y) {
     add(arma::linspace(0, y.size()-1, y.size()), arma::real(y));
     add(arma::linspace(0, y.size()-1, y.size()), arma::imag(y));
+}
+
+void gnuplot::add(const std::string title) {
+    *this << "set title \"" << title << "\"\n";
 }
 
 void gnuplot::set_background(const std::tuple<arma::vec, arma::vec, arma::mat> & xyz) {
