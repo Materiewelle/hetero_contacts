@@ -25,8 +25,8 @@ namespace d {
     static constexpr double lam_c = sqrt(eps_c*d_c*d_c/8/eps_o*log(1+2*d_o/d_c)); // scr. length in channel
     static constexpr double lam_s = 1.0 < lam_c ? 1.0 : lam_c;                    // scr. length in source
     static constexpr double lam_d = 1.0 < lam_c ? 1.0 : lam_c;                    // scr. length in drain
-    static constexpr double l_s   = 15 * lam_s;                                   // source length
-    static constexpr double l_d   = 15 * lam_d;                                   // drain length
+    static constexpr double l_s   = 30 * lam_s;                                   // source length
+    static constexpr double l_d   = 30 * lam_d;                                   // drain length
     static constexpr double l     = l_s + l_c + l_d;                              // device length
 
     // lattice
@@ -47,30 +47,35 @@ namespace d {
     static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
 
     // contacts
-    static constexpr double E_gc  = 0.3;
+    static constexpr double E_gc  = 0.1;
     static constexpr double m_efc = 0.1 * c::m_e;
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
-    static constexpr double tcn   = -0.0;
+    static constexpr double tcn   = -0.2;
+    static constexpr int    Ncs   = N_s / 2;
+    static constexpr int    Ncd   = N_d / 2;
 
     // off diagonal of hamiltonian
     template<int N>
-    inline arma::vec create_t_vec() {
+    inline arma::vec create_t_vec(double e1, double e2) {
         arma::vec ret(N * 2 - 1);
         ret.imbue([&]() {
             static bool b = true;
             if (b) {
                 b = false;
-                return t1;
+                return e1;
             } else {
                 b = true;
-                return t2;
+                return e2;
             }
         });
         return ret;
     }
-    static const     auto t_vec     = create_t_vec<N_x>();
+    static const auto t_vec_cs = create_t_vec<Ncs>(tc1, tc2);
+    static const auto t_vec_g  = create_t_vec<N_x - Ncs - Ncd>(t1, t2);
+    static const auto t_vec_cd = create_t_vec<Ncd>(tc1, tc2);
+    static const auto t_vec = arma::join_vert(t_vec_cs, t_vec_g, t_vec_cd)
 
     // integration parameters
     static constexpr double E_min = -1.5;
