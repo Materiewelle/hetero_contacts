@@ -128,7 +128,7 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
     }
 
     // scaling factor
-    static constexpr double scale = - c::e * 4 / M_PI / M_PI / d::dx / d::d_c / d::d_c;
+    static constexpr double scale = - c::e * 4 / M_PI / M_PI / d::dx / d::d_g / d::d_g;
 
     // scaling and doping
     data = (n_sv + n_sc + n_dv + n_dc) * scale + d::n0;
@@ -154,7 +154,7 @@ void charge_density::update(const wave_packet psi[4]) {
     }
 
     // scaling factor
-    static constexpr double scale = - c::e * 4 / M_PI / M_PI / d::dx / d::d_c / d::d_c;
+    static constexpr double scale = - c::e * 4 / M_PI / M_PI / d::dx / d::d_g / d::d_g;
 
     // scaling and doping
     data = (- n[LV] - n[RV] + n[LC] + n[RC]) * scale + d::n0;
@@ -165,7 +165,7 @@ arma::vec charge_density_impl::get_bound_states(const potential & phi) {
 
     // check for bound states in valence band
     phi0 = arma::min(phi.data(d::s)) - 0.5 * d::E_g;
-    phi1 = arma::max(phi.data(d::c)) - 0.5 * d::E_g;
+    phi1 = arma::max(phi.data(d::g)) - 0.5 * d::E_g;
     phi2 = arma::min(phi.data(d::d)) - 0.5 * d::E_g;
     limit = phi0 > phi2 ? phi0 : phi2;
     if (limit < phi1) {
@@ -174,7 +174,7 @@ arma::vec charge_density_impl::get_bound_states(const potential & phi) {
 
     // check for bound states in conduction band
     phi0 = arma::max(phi.data(d::s)) + 0.5 * d::E_g;
-    phi1 = arma::min(phi.data(d::c)) + 0.5 * d::E_g;
+    phi1 = arma::min(phi.data(d::g)) + 0.5 * d::E_g;
     phi2 = arma::max(phi.data(d::d)) + 0.5 * d::E_g;
     limit = phi0 < phi2 ? phi0 : phi2;
     if (limit > phi1) {
@@ -222,7 +222,7 @@ arma::vec charge_density_impl::get_bound_states_interval(const potential & phi, 
             if ((E(i) > E_min) && (E(i) < E_max)) {
                 // manual norm² since armadillo sucks
                 double loc = 0;
-                for (unsigned j = d::N_s; j < d::N_s + d::N_c; ++j) {
+                for (unsigned j = d::N_s; j < d::N_s + d::N_g; ++j) {
                     loc += psi(j, i) * psi(j, i);
                 }
 

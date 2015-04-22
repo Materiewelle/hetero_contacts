@@ -91,10 +91,10 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 
 void potential::smooth() {
     // smooth source region
-    smooth<(d::F_s > 0)>(0, d::N_s + d::N_c * 0.2);
+    smooth<(d::F_s > 0)>(0, d::N_sc + d::N_s + d::N_g * 0.2);
 
     // smooth drain region
-    smooth<(d::F_d > 0)>(d::N_s + d::N_c * 0.8, d::N_x);
+    smooth<(d::F_d > 0)>(d::N_sc + d::N_s + d::N_g * 0.8, d::N_x);
 
     update_twice();
 }
@@ -183,7 +183,7 @@ arma::vec potential_impl::poisson(const voltage & V, const charge_density & n) {
 
     // build right side
     auto R = get_R(V);
-    R += n.data / c::eps_0 / d::eps_c * 1e9;
+    R += n.data / c::eps_0 / d::eps_g * 1e9;
 
     return solve(potential_impl::S, R);
 }
@@ -193,9 +193,11 @@ arma::vec potential_impl::get_R(const voltage & V) {
 
     // build right side (without n)
     auto R = vec(d::N_x);
+    R(d::sc).fill((V.s + d::F_s) / d::lam_s / d::lam_s);
     R(d::s).fill((V.s + d::F_s) / d::lam_s / d::lam_s);
-    R(d::c).fill((V.g + d::F_c) / d::lam_c / d::lam_c);
+    R(d::g).fill((V.g + d::F_g) / d::lam_g / d::lam_g);
     R(d::d).fill((V.d + d::F_d) / d::lam_d / d::lam_d);
+    R(d::dc).fill((V.d + d::F_d) / d::lam_d / d::lam_d);
 
     return R;
 }
@@ -205,9 +207,11 @@ arma::mat potential_impl::get_S() {
 
     // main diagonal
     auto t0 = vec(d::N_x);
+    t0(d::sc).fill(-2.0 / d::dx / d::dx - 1.0 / d::lam_s / d::lam_s);
     t0(d::s).fill(- 2.0 / d::dx / d::dx - 1.0 / d::lam_s / d::lam_s);
-    t0(d::c).fill(- 2.0 / d::dx / d::dx - 1.0 / d::lam_c / d::lam_c);
+    t0(d::g).fill(- 2.0 / d::dx / d::dx - 1.0 / d::lam_g / d::lam_g);
     t0(d::d).fill(- 2.0 / d::dx / d::dx - 1.0 / d::lam_d / d::lam_d);
+    t0(d::dc).fill(-2.0 / d::dx / d::dx - 1.0 / d::lam_d / d::lam_d);
 
     // off diagonal
     auto t1 = vec(d::N_x - 1);
