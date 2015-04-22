@@ -112,10 +112,10 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
     arma::vec x_r = d::x(arma::span(d::N_x-N_d, d::N_x-1));
     gp.add(x_r, fermi_r);
 
-    gp << "set style line 1 lt 1 lc rgb '#F6A800' lw 2\n";
-    gp << "set style line 2 lt 1 lc rgb '#F6A800' lw 2\n";
-    gp << "set style line 3 lt 3 lc rgb '#000000' lw 1\n";
-    gp << "set style line 4 lt 3 lc rgb '#000000' lw 1\n";
+    gp << "set style line 1 lt 1 lc rgb RWTH_Orange lw 2\n";
+    gp << "set style line 2 lt 1 lc rgb RWTH_Orange lw 2\n";
+    gp << "set style line 3 lt 3 lc rgb RWTH_Schwarz lw 1\n";
+    gp << "set style line 4 lt 3 lc rgb RWTH_Schwarz lw 1\n";
 
     gp.plot();
 }
