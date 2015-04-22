@@ -94,10 +94,10 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
             return lin;
         }
     };
-    vec i_sv = get_intervals(phi.s() + d::E_min, phi.s() - 0.5 * d::E_g);
-    vec i_sc = get_intervals(phi.s() + 0.5 * d::E_g, phi.s() + d::E_max);
-    vec i_dv = get_intervals(phi.d() + d::E_min, phi.d() - 0.5 * d::E_g);
-    vec i_dc = get_intervals(phi.d() + 0.5 * d::E_g, phi.d() + d::E_max);
+    vec i_sv = get_intervals(phi.s() + d::E_min, phi.s() - 0.5 * d::E_gc + d::tcn);
+    vec i_sc = get_intervals(phi.s() + 0.5 * d::E_gc + d::tcn, phi.s() + d::E_max);
+    vec i_dv = get_intervals(phi.d() + d::E_min, phi.d() - 0.5 * d::E_gc + d::tcn);
+    vec i_dc = get_intervals(phi.d() + 0.5 * d::E_gc + d::tcn, phi.d() + d::E_max);
 
     // calculate charge density
     auto n_sv = integral<d::N_x>([&] (double E) -> vec {
