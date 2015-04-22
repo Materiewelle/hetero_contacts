@@ -19,32 +19,11 @@ int main() {
     //(i.e. set bits 15 and 6 in SSE control register MXCSR)
     _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
     _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-    potential phi = potential({0, 0.3, 0.6});
-//    plot_ldos(phi, 1000);
 
-    vec E = linspace(-20, 20, 500);
+    steady_state s({0,0.3,0.5});
+    s.solve();
 
-    cx_vec alt_s(500);
-    cx_vec alt_d(500);
-    cx_vec test_s(500);
-    cx_vec test_d(500);
-    for (int i = 0; i < 500; ++i) {
-        self_energy(phi, E(i), alt_s(i), alt_d(i));
-        self_energy_test(phi, E(i), test_s(i), test_d(i));
-    }
-
-    gnuplot gps;
-    gps.add(alt_s);
-    gps.add(test_s);
-    gps << "set title \"source\"\n";
-    gps.plot();
-
-    gnuplot gpd;
-    gpd.add(alt_d);
-    gpd.add(test_d);
-    gpd << "set title \"drain\"\n";
-    gpd.plot();
-
+    plot_ldos(s.phi, 1000);
 
 
 

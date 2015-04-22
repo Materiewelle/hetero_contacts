@@ -13,7 +13,7 @@ class wave_packet;
 
 class charge_density {
 public:
-    static constexpr int initial_waypoints = 30;
+    static constexpr int initial_waypoints = 10;
     arma::vec data;
 
     inline charge_density();

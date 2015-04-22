@@ -50,9 +50,9 @@ namespace d {
     static constexpr double E_gc  = 0.3;
     static constexpr double m_efc = 0.1 * c::m_e;
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
-    static constexpr double tc2   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
+    static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar*c::h_bar / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
-    static constexpr double tcn   = -0.2;
+    static constexpr double tcn   = -0.0;
 
     // off diagonal of hamiltonian
     template<int N>
@@ -75,7 +75,7 @@ namespace d {
     // integration parameters
     static constexpr double E_min = -1.5;
     static constexpr double E_max = +1.5;
-    static constexpr double rel_tol = 1e-3;
+    static constexpr double rel_tol = 5e-3;
 
     // doping
     inline arma::vec create_n0() {

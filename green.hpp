@@ -9,45 +9,29 @@
 #include "inverse.hpp"
 #include "potential.hpp"
 
-static inline void self_energy_test(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {
+static inline void self_energy(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {
     using namespace arma;
     using namespace std;
 
     // kinetic energy in source and drain
-    auto E_s = E - phi.s();
-    auto E_d = E - phi.d();
+    auto E_s = E - phi.s() - d::tcn;
+    auto E_d = E - phi.d() - d::tcn;
 
     // shortcuts
-    static constexpr double t12 = d::t1 * d::t1;
-    static constexpr double t22 = d::t2 * d::t2;
+    static constexpr double t12 = d::tc1 * d::tc1;
+    static constexpr double t22 = d::tc2 * d::tc2;
 
     // self energy
     Sigma_s = E_s * E_s - t12 - t22;
     Sigma_s = 0.5 * (E_s * E_s - t12 + t22 + sqrt(Sigma_s * Sigma_s + - 4 * t12 * t22)) / E_s;
+    Sigma_s *= d::tcc * d::tcc / t22;
     Sigma_d = E_d * E_d - t12 - t22;
     Sigma_d = 0.5 * (E_d * E_d - t12 + t22 + sqrt(Sigma_d * Sigma_d + - 4 * t12 * t22)) / E_d;
+    Sigma_d *= d::tcc * d::tcc / t22;
 
     // imaginary part must be negative
     Sigma_s.imag(-std::abs(Sigma_s.imag()));
     Sigma_d.imag(-std::abs(Sigma_d.imag()));
-}
-
-static inline void self_energy(const potential & phi, double E, arma::cx_double & Sigma_s, arma::cx_double & Sigma_d) {
-    using namespace arma;
-    using namespace std;
-    // kinetic energy in source and drain
-    auto E_s = E - phi.s();
-    auto E_d = E - phi.d();
-
-    // get wave vectors (times lattice constant)
-    auto k_s = acos((E_s * E_s - d::t1 * d::t1 - d::t2 * d::t2) / (2 * d::t1 * d::t2) + 0i);
-    auto k_d = acos((E_d * E_d - d::t1 * d::t1 - d::t2 * d::t2) / (2 * d::t1 * d::t2) + 0i);
-    k_s = copysign(1.0, E_s) * k_s.real() + abs(k_s.imag()) * 1i;
-    k_d = copysign(1.0, E_d) * k_d.real() + abs(k_d.imag()) * 1i;
-
-    // self energy
-    Sigma_s = (d::t1 * d::t2 * exp(1i * k_s) + d::t2 * d::t2) / E_s;
-    Sigma_d = (d::t1 * d::t2 * exp(1i * k_d) + d::t2 * d::t2) / E_d;
 }
 
 template<bool source>
