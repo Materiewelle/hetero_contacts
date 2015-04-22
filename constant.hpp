@@ -15,7 +15,7 @@ namespace c {
     static constexpr double m_e    = 9.10938188E-31;  // electron mass
     static constexpr double T      = 300;             // Temperature in Kelvin
 
-    static inline constexpr double epsilon(double x) {
+    static inline constexpr double epsilon(double x = 1.0) {
         return std::nextafter(x, x + 1.0) - x;
     }
 

@@ -69,19 +69,19 @@ namespace d {
     inline arma::vec create_t_vec() {
         arma::vec ret(N_x * 2 - 1);
         bool b = true;
-        for (int i = sc2.a; i < sc2.b; ++i) {
+        for (unsigned i = sc2.a; i < sc2.b; ++i) {
             ret(i) = b ? tc1 : tc2;
             b = !b;
         }
         ret(sc2.b) = tcc;
         b = true;
-        for (int i = s2.a; i < d2.b; ++i) {
+        for (unsigned i = s2.a; i < d2.b; ++i) {
             ret(i) = b ? t1 : t2;
             b = !b;
         }
         ret(d2.b) = tcc;
         b = true;
-        for (int i = dc2.a; i < dc2.b; ++i) {
+        for (unsigned i = dc2.a; i < dc2.b; ++i) {
             ret(i) = b ? tc1 : tc2;
             b = !b;
         }
@@ -91,6 +91,7 @@ namespace d {
         arma::vec ret(N_x * 2);
         ret(sc2).fill(tcn);
         ret(dc2).fill(tcn);
+        return ret;
     }
 
     static const auto t_vec = create_t_vec();
@@ -104,28 +105,50 @@ namespace d {
     // doping
     inline arma::vec create_n0() {
         using namespace arma;
-        vec x0, x1, w0, w1;
 
-        vec n0 = integral<3>([] (double E) {
+        vec x0, x1, x2, x3, w0, w1, w2, w3;
+
+        // check if F_s - tcn or F_s + tcn!!
+        vec nvc = integral<2>([] (double E) {
+            double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
+            vec ret = arma::vec(2);
+            ret(0) = (1 - fermi(E, F_s - tcn)) * dos;
+            ret(1) = (1 - fermi(E, F_d - tcn)) * dos;
+            return ret;
+        }, linspace(E_min, -0.5 * E_gc, 100), rel_tol, c::epsilon(), x0, w0);
+        vec ncc = integral<2>([] (double E) {
+            double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
+            vec ret = arma::vec(2);
+            ret(0) = fermi(E, F_s - tcn) * dos;
+            ret(1) = fermi(E, F_d - tcn) * dos;
+            return ret;
+        }, linspace(0.5 * E_gc, E_max, 100), rel_tol, c::epsilon(), x1, w1);
+        vec nvsgd = integral<3>([] (double E) {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
             ret(0) = (1 - fermi(E, F_s)) * dos;
             ret(1) = (1 - fermi(E, F_g)) * dos;
             ret(2) = (1 - fermi(E, F_d)) * dos;
             return ret;
-        }, linspace(E_min , - 0.5 * E_g, 100), rel_tol, std::numeric_limits<double>::epsilon(), x0, w0) + integral<3>([] (double E) {
+        }, linspace(E_min, - 0.5 * E_g, 100), rel_tol, c::epsilon(), x2, w2);
+        vec ncsgd = integral<3>([] (double E) {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
             ret(0) = fermi(E, F_s) * dos;
             ret(1) = fermi(E, F_g) * dos;
             ret(2) = fermi(E, F_d) * dos;
             return ret;
-        }, linspace(0.5 * E_g, E_max, 100), rel_tol, std::numeric_limits<double>::epsilon(), x1, w1);
+        }, linspace(0.5 * E_g, E_max, 100), rel_tol, c::epsilon(), x3, w3);
+
+        vec nc = nvc + ncc;
+        vec nsgd = nvsgd + ncsgd;
 
         vec ret(N_x);
-        ret(s).fill(n0(0));
-        ret(g).fill(n0(1));
-        ret(d).fill(n0(2));
+        ret(sc).fill(nc(0));
+        ret(s).fill(nsgd(0));
+        ret(g).fill(nsgd(1));
+        ret(d).fill(nsgd(2));
+        ret(dc).fill(nc(1));
 
         ret *= 16 * c::e / M_PI / M_PI / dx / d_g / d_g;
 
