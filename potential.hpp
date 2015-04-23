@@ -193,11 +193,11 @@ arma::vec potential_impl::get_R(const voltage & V) {
 
     // build right side (without n)
     auto R = vec(d::N_x);
-    R(d::sc).fill((V.s + d::F_s) / d::lam_s / d::lam_s);
+    R(d::sc).fill((V.s + d::F_sc) / d::lam_s / d::lam_s);
     R(d::s).fill((V.s + d::F_s) / d::lam_s / d::lam_s);
     R(d::g).fill((V.g + d::F_g) / d::lam_g / d::lam_g);
     R(d::d).fill((V.d + d::F_d) / d::lam_d / d::lam_d);
-    R(d::dc).fill((V.d + d::F_d) / d::lam_d / d::lam_d);
+    R(d::dc).fill((V.d + d::F_dc) / d::lam_d / d::lam_d);
 
     return R;
 }

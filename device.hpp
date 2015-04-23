@@ -13,10 +13,14 @@ namespace d {
     static constexpr double eps_g = 11.2;                                         // relative permittivity of channel
     static constexpr double eps_o = 12;                                           // relative permittivity of oxide
     static constexpr double E_g   = 0.6;                                          // bandgap
-    static constexpr double m_eff = 0.2 * c::m_e;                                 // effective mass in conduction band
+    static constexpr double m_eff = 0.2 * c::m_e;                                 // effective mass
+    static constexpr double E_gc  = 0.2;                                          // bandgap of contacts
+    static constexpr double m_efc = 0.1 * c::m_e;                                 // effective mass of contacts
     static constexpr double F_s   = +(E_g/2 + 0.0151);                            // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.0151);                            // Fermi level in drain
+    static constexpr double F_sc  = F_s + 0.0;                                    // Fermi level in source contact
+    static constexpr double F_dc  = F_d - 0.0;                                    // Fermi level in drain contact
 
     // geometry (everything in nm)
     static constexpr double l_sc  = 10;                                           // source contact length
@@ -58,8 +62,7 @@ namespace d {
     static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
 
     // contacts
-    static constexpr double E_gc  = 0.2;
-    static constexpr double m_efc = 0.5 * c::m_e;
+
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
