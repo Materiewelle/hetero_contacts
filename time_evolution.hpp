@@ -81,7 +81,6 @@ void time_evolution::solve() {
     cx_mat H_eff(2*d::N_x, 2*d::N_x);
     H_eff.fill(0);
     H_eff.diag(+1) = conv_to<cx_vec>::from(d::t_vec);
-    H_eff.diag( 0) = conv_to<cx_vec>::from(d::t_diag);
     H_eff.diag(-1) = conv_to<cx_vec>::from(d::t_vec);
 
     anderson mr_neo;
@@ -114,7 +113,7 @@ void time_evolution::solve() {
         // self-consistency loop
         for (int it = 0; it < max_iterations; ++it) {
             // diagonal of H with self-energy
-            H_eff.diag() = conv_to<cx_vec>::from(0.5 * (phi[m].twice + phi[m-1].twice));
+            H_eff.diag() = conv_to<cx_vec>::from(0.5 * (phi[m].twice + phi[m-1].twice) + d::t_diag);
             H_eff(         0,         0) -= 1i * t::g * q.s(0);
             H_eff(2*d::N_x-1,2*d::N_x-1) -= 1i * t::g * q.d(0);
 
@@ -192,6 +191,7 @@ void time_evolution::solve() {
     }
 }
 
+// CHECK THIS
 template<bool left>
 void time_evolution::get_tunnel_energies(arma::vec & E, arma::vec & W) {
     double max = 0.0;
