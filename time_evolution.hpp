@@ -74,10 +74,6 @@ void time_evolution::solve() {
     psi[LT].init< true>(E_lt, W_lt, phi[0]);
     psi[RT].init<false>(E_rt, W_rt, phi[0]);
 
-    charge_density ntest;
-    ntest.update(psi);
-    plot(vec((n[0].data - ntest.data)/n[0].data));
-
     // precalculate q-values
     calculate_q();
 
@@ -158,7 +154,6 @@ void time_evolution::solve() {
 
             // update n
             n[m].update(psi);
-            plot(vec((n[0].data - n[m].data)/n[0].data));
 
             // update potential
             auto dphi = phi[m].update(V[m], n[m], mr_neo);
