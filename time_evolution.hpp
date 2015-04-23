@@ -191,7 +191,6 @@ void time_evolution::solve() {
     }
 }
 
-// CHECK THIS
 template<bool left>
 void time_evolution::get_tunnel_energies(arma::vec & E, arma::vec & W) {
     double max = 0.0;

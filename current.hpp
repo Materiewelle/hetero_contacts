@@ -94,8 +94,10 @@ current::current(const wave_packet psi[6], const potential & phi0, const potenti
         mat ret(m.n_rows / 2, m.n_cols);
         auto ptr0 = m.memptr();
         auto ptr1 = ret.memptr();
+        vec t_vec(d::t_vec.size() + 1);
+        t_vec({0, d::t_vec.size() - 1}) = d::t_vec;
         for (unsigned i = 1; i < m.n_elem - 1; i += 2) {
-            (*ptr1++) = std::imag(ptr0[i] * std::conj(ptr0[i + 1]));
+            (*ptr1++) = std::imag(ptr0[i] * std::conj(ptr0[i + 1])) * t_vec(i % t_vec.size());
         }
         for (unsigned i = 0; i < m.n_cols; ++i) {
             ret(d::N_x-1, i) = ret(d::N_x-2, i);
@@ -107,7 +109,7 @@ current::current(const wave_packet psi[6], const potential & phi0, const potenti
     auto psi_I_lc = get_psi_I(psi[LC].data);
     auto psi_I_rc = get_psi_I(psi[RC].data);
 
-    static constexpr auto scale = 4.0 * d::t2 * c::e * c::e / c::h_bar / M_PI;
+    static constexpr auto scale = 4.0 * c::e * c::e / c::h_bar / M_PI;
 
     lv = scale * psi_I_lv * psi[LV].W;
     rv = scale * psi_I_rv * psi[RV].W;

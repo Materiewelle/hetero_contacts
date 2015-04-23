@@ -36,7 +36,7 @@ int main() {
     te.solve();
 
     plot(te.I[0].total);
-    plot(te.I[9].total);
+    plot(te.I[1].total);
 
     return 0;
 }
