@@ -105,8 +105,8 @@ void wave_packet::memory_update(const sd_vec & affe, unsigned m) {
 
 void wave_packet::source_init(const sd_vec & u, const sd_vec & q) {
     using namespace std::complex_literals;
-    source.s = - 2i * t::g * u.s(1) * (d::t2 * out.s + 1i * t::g * q.s(0) * in.s) / (1.0 + 1i * t::g * E);
-    source.d = - 2i * t::g * u.d(1) * (d::t2 * out.d + 1i * t::g * q.d(0) * in.d) / (1.0 + 1i * t::g * E);
+    source.s = - 2i * t::g * u.s(1) * (d::tc2 * out.s + 1i * t::g * q.s(0) * in.s) / (1.0 + 1i * t::g * E);
+    source.d = - 2i * t::g * u.d(1) * (d::tc2 * out.d + 1i * t::g * q.d(0) * in.d) / (1.0 + 1i * t::g * E);
 }
 
 void wave_packet::source_update(const sd_vec & u, const sd_vec & L, const sd_vec & qsum, int m) {
