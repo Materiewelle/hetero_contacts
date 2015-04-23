@@ -14,8 +14,8 @@ static inline void self_energy(const potential & phi, double E, arma::cx_double 
     using namespace std;
 
     // kinetic energy in source and drain
-    auto E_s = E - phi.s() - d::tcn;
-    auto E_d = E - phi.d() - d::tcn;
+    auto E_s = E - phi.s();
+    auto E_d = E - phi.d();
 
     // shortcuts
     static constexpr double t12 = d::tc1 * d::tc1;
@@ -42,7 +42,6 @@ static inline arma::cx_vec green_col(const potential & phi, double E, arma::cx_d
 
     // build diagonal part of hamiltonian
     auto D = conv_to<cx_vec>::from(E - phi.twice);
-    D = D - d::t_diag;
     D(0)            -= Sigma_s;
     D(D.size() - 1) -= Sigma_d;
 
@@ -62,14 +61,13 @@ static inline arma::mat get_lDOS(const potential & phi, int N_grid, arma::vec & 
 
     E = linspace(phi_min - 0.5 * d::E_g - 0.2, phi_max + 0.5 * d::E_g + 0.2, N_grid);
 
-    #pragma omp parallel for schedule(static)
+    //#pragma omp parallel for schedule(static)
     for (int i = 0; i < N_grid; ++i) {
         cx_double Sigma_s;
         cx_double Sigma_d;
         self_energy(phi, E(i), Sigma_s, Sigma_d);
 
         auto D = conv_to<cx_vec>::from(E(i) - phi.twice);
-        D = D - d::t_diag;
         D(0)            -= Sigma_s;
         D(D.size() - 1) -= Sigma_d;
         D += 0.001i;
@@ -92,26 +90,26 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
     gp << "set zlabel \"log(lDOS)\"\n";
     gp << "unset key\n";
     gp << "unset colorbox\n";
-    gp << "set terminal pdf rounded color enhanced font 'arial,12'\n";
-    gp << "set output 'lDOS.pdf'\n";
+    //gp << "set terminal pdf rounded color enhanced font 'arial,12'\n";
+    //gp << "set output 'lDOS.pdf'\n";
 
     arma::vec E;
     arma::mat lDOS = get_lDOS(phi, N_grid, E);
     gp.set_background(d::x, E, arma::log(lDOS));
 
     arma::vec vband = phi.data;
-    vband(d::sc) += -0.5 * d::E_gc + d::tcn;
+    vband(d::sc) += -0.5 * d::E_gc;
     vband(d::s)  += -0.5 * d::E_g;
     vband(d::g)  += -0.5 * d::E_g;
     vband(d::d)  += -0.5 * d::E_g;
-    vband(d::dc) += -0.5 * d::E_gc + d::tcn;
+    vband(d::dc) += -0.5 * d::E_gc;
 
     arma::vec cband = phi.data;
-    cband(d::sc) += +0.5 * d::E_gc + d::tcn;
+    cband(d::sc) += +0.5 * d::E_gc;
     cband(d::s)  += +0.5 * d::E_g;
     cband(d::g)  += +0.5 * d::E_g;
     cband(d::d)  += +0.5 * d::E_g;
-    cband(d::dc) += +0.5 * d::E_gc + d::tcn;
+    cband(d::dc) += +0.5 * d::E_gc;
 
     gp.add(d::x, vband);
     gp.add(d::x, cband);

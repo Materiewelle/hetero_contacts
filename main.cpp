@@ -25,7 +25,5 @@ int main() {
 
     plot_ldos(s.phi, 1000);
 
-
-
     return 0;
 }

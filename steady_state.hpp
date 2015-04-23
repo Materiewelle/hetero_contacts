@@ -57,6 +57,7 @@ bool steady_state::solve() {
     for (it = 1; it <= max_iterations; ++it) {
         // update charge density
         n.update(phi, E, W);
+        plot(n.data);
 
         // update potential
         dphi = phi.update(V, n, mr_neo);

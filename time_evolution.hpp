@@ -113,7 +113,7 @@ void time_evolution::solve() {
         // self-consistency loop
         for (int it = 0; it < max_iterations; ++it) {
             // diagonal of H with self-energy
-            H_eff.diag() = conv_to<cx_vec>::from(0.5 * (phi[m].twice + phi[m-1].twice) + d::t_diag);
+            H_eff.diag() = conv_to<cx_vec>::from(0.5 * (phi[m].twice + phi[m-1].twice));
             H_eff(         0,         0) -= 1i * t::g * q.s(0);
             H_eff(2*d::N_x-1,2*d::N_x-1) -= 1i * t::g * q.d(0);
 

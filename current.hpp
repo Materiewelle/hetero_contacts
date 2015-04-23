@@ -42,10 +42,10 @@ current::current(const potential & phi)
     vec E_lv, E_rv, E_lc, E_rc, E_lt, E_rt;
     vec W_lv, W_rv, W_lc, W_rc, W_lt, W_rt;
 
-    auto i_lv = linspace(phi.s() + d::E_min, phi.s() - 0.5 * d::E_gc + d::tcn, 50);
-    auto i_rv = linspace(phi.d() + d::E_min, phi.d() - 0.5 * d::E_gc + d::tcn, 50);
-    auto i_lc = linspace(phi.s() + 0.5 * d::E_gc + d::tcn, phi.s() + d::E_max, 50);
-    auto i_rc = linspace(phi.d() + 0.5 * d::E_gc + d::tcn, phi.d() + d::E_max, 50);
+    auto i_lv = linspace(phi.s() + d::E_min, phi.s() - 0.5 * d::E_gc, 50);
+    auto i_rv = linspace(phi.d() + d::E_min, phi.d() - 0.5 * d::E_gc, 50);
+    auto i_lc = linspace(phi.s() + 0.5 * d::E_gc, phi.s() + d::E_max, 50);
+    auto i_rc = linspace(phi.d() + 0.5 * d::E_gc, phi.d() + d::E_max, 50);
 
     lv.fill(integral<1>([&] (double E) {
         return - scale * transmission(E) * (1.0 - fermi(E - phi.s(), d::F_s));
@@ -64,14 +64,14 @@ current::current(const potential & phi)
     }, i_rc, d::rel_tol, c::epsilon(1e-10), E_rc, W_rc));
 
     if (phi.s() > phi.d() + d::E_gc) {
-        auto i_lt = linspace(phi.d() + 0.5 * d::E_gc + d::tcn, phi.s() - 0.5 * d::E_gc + d::tcn, 100);
+        auto i_lt = linspace(phi.d() + 0.5 * d::E_gc, phi.s() - 0.5 * d::E_gc, 100);
 
         lt.fill(integral<1>([&] (double E) {
             return scale * transmission(E);
         }, i_lt, d::rel_tol, c::epsilon(1e-10), E_lt, W_lt));
         rt.fill(0.0);
     } else if (phi.d() > phi.s() + d::E_gc) {
-        auto i_rt = linspace(phi.s() + 0.5 * d::E_gc + d::tcn, phi.d() - 0.5 * d::E_gc + d::tcn, 100);
+        auto i_rt = linspace(phi.s() + 0.5 * d::E_gc, phi.d() - 0.5 * d::E_gc, 100);
 
         lt.fill(0.0);
         rt.fill(integral<1>([&] (double E) {

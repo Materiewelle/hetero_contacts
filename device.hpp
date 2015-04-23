@@ -16,11 +16,11 @@ namespace d {
     static constexpr double m_eff = 0.2 * c::m_e;                                 // effective mass
     static constexpr double E_gc  = 0.2;                                          // bandgap of contacts
     static constexpr double m_efc = 0.1 * c::m_e;                                 // effective mass of contacts
-    static constexpr double F_s   = +(E_g/2 + 0.0151);                            // Fermi level in source
+    static constexpr double F_s   = -(E_g/2 + 0.0151);                            // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.0151);                            // Fermi level in drain
-    static constexpr double F_sc  = F_s + 0.0;                                    // Fermi level in source contact
-    static constexpr double F_dc  = F_d - 0.0;                                    // Fermi level in drain contact
+    static constexpr double F_sc  = F_s + 0.1;                                    // Fermi level in source contact
+    static constexpr double F_dc  = F_d - 0.1;                                    // Fermi level in drain contact
 
     // geometry (everything in nm)
     static constexpr double l_sc  = 5;                                            // source contact length
@@ -65,7 +65,7 @@ namespace d {
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
-    static constexpr double tcn   = -0.1;
+    //static constexpr double tcn   = -0.1;
 
     // constant parts of hamiltonian
     inline arma::vec create_t_vec() {
@@ -89,15 +89,8 @@ namespace d {
         }
         return ret;
     }
-    inline arma::vec create_t_diag() {
-        arma::vec ret(N_x * 2);
-        ret(sc2).fill(tcn);
-        ret(dc2).fill(tcn);
-        return ret;
-    }
 
     static const auto t_vec = create_t_vec();
-    static const auto t_diag = create_t_diag();
 
     // integration parameters
     static constexpr double E_min = -1.5;
@@ -114,15 +107,15 @@ namespace d {
         vec nvc = integral<2>([] (double E) {
             double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
             vec ret = arma::vec(2);
-            ret(0) = (1 - fermi(E, F_s - tcn)) * dos;
-            ret(1) = (1 - fermi(E, F_d - tcn)) * dos;
+            ret(0) = (1 - fermi(E, F_sc)) * dos;
+            ret(1) = (1 - fermi(E, F_dc)) * dos;
             return ret;
         }, linspace(E_min, -0.5 * E_gc, 100), rel_tol, c::epsilon(), x0, w0);
         vec ncc = integral<2>([] (double E) {
             double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
             vec ret = arma::vec(2);
-            ret(0) = fermi(E, F_s - tcn) * dos;
-            ret(1) = fermi(E, F_d - tcn) * dos;
+            ret(0) = fermi(E, F_sc) * dos;
+            ret(1) = fermi(E, F_dc) * dos;
             return ret;
         }, linspace(0.5 * E_gc, E_max, 100), rel_tol, c::epsilon(), x1, w1);
         vec nvsgd = integral<3>([] (double E) {
