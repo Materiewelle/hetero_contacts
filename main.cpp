@@ -20,10 +20,15 @@ int main() {
     _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
     _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
-    steady_state s({0,0.7,0.8});
-    s.solve<false>();
+//    steady_state s({0,0.7,0.8});
+//    s.solve<false>();
 
-    plot_ldos(s.phi, 1000);
+//    plot_ldos(s.phi, 1000);
+
+    time_evolution te;
+    std::fill(begin(te.V), end(te.V), voltage{0, 0, 0});
+    te.solve();
+
 
     return 0;
 }
