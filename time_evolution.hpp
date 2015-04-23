@@ -74,6 +74,11 @@ void time_evolution::solve() {
     psi[LT].init< true>(E_lt, W_lt, phi[0]);
     psi[RT].init<false>(E_rt, W_rt, phi[0]);
 
+    charge_density ntest;
+    ntest.update(psi);
+    plot(n[0].data);
+    plot(ntest.data);
+
     // precalculate q-values
     calculate_q();
 
