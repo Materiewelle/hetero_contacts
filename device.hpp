@@ -11,22 +11,22 @@ namespace d {
 
     // material properties
     static constexpr double eps_g = 11.2;                                         // relative permittivity of channel
-    static constexpr double eps_o = 12;                                           // relative permittivity of oxide
+    static constexpr double eps_o = 15;                                           // relative permittivity of oxide
     static constexpr double E_g   = 0.6;                                          // bandgap
-    static constexpr double m_eff = 0.2 * c::m_e;                                 // effective mass in conduction band
-    static constexpr double F_s   = +(E_g/2 + 0.0151);                            // Fermi level in source
+    static constexpr double m_eff = 0.04 * c::m_e;                                 // effective mass in conduction band
+    static constexpr double F_s   = -(E_g/2 + 0.0151);                            // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.0151);                            // Fermi level in drain
 
     // geometry (everything in nm)
-    static constexpr double l_sc  = 10;                                           // source contact length
+    static constexpr double l_sc  = 5;                                            // source contact length
     static constexpr double l_s   = 10;                                           // source length
-    static constexpr double l_g   = 10;                                           // gate length
+    static constexpr double l_g   = 15;                                           // gate length
     static constexpr double l_d   = 10;                                           // drain length
-    static constexpr double l_dc  = 10;                                           // drain contactlength
+    static constexpr double l_dc  = 5;                                            // drain contactlength
     static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length
-    static constexpr double d_g   = 2;                                            // channel thickness
-    static constexpr double d_o   = 0.8;                                          // oxide thickness
+    static constexpr double d_g   = 1.9;                                          // channel thickness
+    static constexpr double d_o   = 1;                                            // oxide thickness
     static constexpr double lam_g = sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
     static constexpr double lam_s = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
     static constexpr double lam_d = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
@@ -58,12 +58,12 @@ namespace d {
     static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
 
     // contacts
-    static constexpr double E_gc  = 0.2;
-    static constexpr double m_efc = 0.5 * c::m_e;
+    static constexpr double E_gc  = 0.3;
+    static constexpr double m_efc = 0.1 * c::m_e;
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
-    static constexpr double tcn   = 0;
+    static constexpr double tcn   = -0.1;
 
     // constant parts of hamiltonian
     inline arma::vec create_t_vec() {

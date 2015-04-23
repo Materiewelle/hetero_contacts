@@ -42,6 +42,7 @@ static inline arma::cx_vec green_col(const potential & phi, double E, arma::cx_d
 
     // build diagonal part of hamiltonian
     auto D = conv_to<cx_vec>::from(E - phi.twice);
+    D = D - d::t_diag;
     D(0)            -= Sigma_s;
     D(D.size() - 1) -= Sigma_d;
 
@@ -68,6 +69,7 @@ static inline arma::mat get_lDOS(const potential & phi, int N_grid, arma::vec & 
         self_energy(phi, E(i), Sigma_s, Sigma_d);
 
         auto D = conv_to<cx_vec>::from(E(i) - phi.twice);
+        D = D - d::t_diag;
         D(0)            -= Sigma_s;
         D(D.size() - 1) -= Sigma_d;
         D += 0.001i;
@@ -90,21 +92,37 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
     gp << "set zlabel \"log(lDOS)\"\n";
     gp << "unset key\n";
     gp << "unset colorbox\n";
+    gp << "set terminal pdf rounded color enhanced font 'arial,12'\n";
+    gp << "set output 'lDOS.pdf'\n";
 
     arma::vec E;
     arma::mat lDOS = get_lDOS(phi, N_grid, E);
     gp.set_background(d::x, E, arma::log(lDOS));
 
-    gp.add(d::x, phi.data + 0.5 * d::E_g);
-    gp.add(d::x, phi.data - 0.5 * d::E_g);
+    arma::vec vband = phi.data;
+    vband(d::sc) += -0.5 * d::E_gc + d::tcn;
+    vband(d::s)  += -0.5 * d::E_g;
+    vband(d::g)  += -0.5 * d::E_g;
+    vband(d::d)  += -0.5 * d::E_g;
+    vband(d::dc) += -0.5 * d::E_gc + d::tcn;
 
-    unsigned N_s = std::round(0.5 * d::N_s);
+    arma::vec cband = phi.data;
+    cband(d::sc) += +0.5 * d::E_gc + d::tcn;
+    cband(d::s)  += +0.5 * d::E_g;
+    cband(d::g)  += +0.5 * d::E_g;
+    cband(d::d)  += +0.5 * d::E_g;
+    cband(d::dc) += +0.5 * d::E_gc + d::tcn;
+
+    gp.add(d::x, vband);
+    gp.add(d::x, cband);
+
+    unsigned N_s = std::round(d::N_sc + 0.5 * d::N_s);
     arma::vec fermi_l(N_s);
     fermi_l.fill(d::F_s + phi.s());
     arma::vec x_l = d::x(arma::span(0, N_s-1));
     gp.add(x_l, fermi_l);
 
-    unsigned N_d = std::round(0.5 * d::N_d);
+    unsigned N_d = std::round(d::N_dc + 0.5 * d::N_d);
     arma::vec fermi_r(N_d);
     fermi_r.fill(d::F_d + phi.d());
     arma::vec x_r = d::x(arma::span(d::N_x-N_d, d::N_x-1));
@@ -112,8 +130,8 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
 
     gp << "set style line 1 lt 1 lc rgb RWTH_Orange lw 2\n";
     gp << "set style line 2 lt 1 lc rgb RWTH_Orange lw 2\n";
-    gp << "set style line 3 lt 3 lc rgb RWTH_Schwarz lw 1\n";
-    gp << "set style line 4 lt 3 lc rgb RWTH_Schwarz lw 1\n";
+    gp << "set style line 3 lc rgb RWTH_Schwarz lw 1 lt 3\n";
+    gp << "set style line 4 lc rgb RWTH_Schwarz lw 1 lt 3\n";
 
     gp.plot();
 }
