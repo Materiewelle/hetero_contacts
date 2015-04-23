@@ -101,30 +101,30 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
 
     // calculate charge density
     auto n_sv = integral<d::N_x>([&] (double E) -> vec {
-        return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_s) - 1);
+        return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_sc) - 1);
     }, i_sv, d::rel_tol, c::epsilon(1), E[LV], W[LV]);
     auto n_dv = integral<d::N_x>([&] (double E) -> vec {
-        return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_d) - 1);
+        return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_dc) - 1);
     }, i_dv, d::rel_tol, c::epsilon(1), E[RV], W[RV]);
     auto n_sc = integral<d::N_x>([&] (double E) -> vec {
-        return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_s));
+        return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_sc));
     }, i_sc, d::rel_tol, c::epsilon(1), E[LC], W[LC]);
     auto n_dc = integral<d::N_x>([&] (double E) -> vec {
-        return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_d));
+        return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_dc));
     }, i_dc, d::rel_tol, c::epsilon(1), E[RC], W[RC]);
 
-    // multiply fermi function with weights
+    // multiply weights with fermi function
     for (unsigned i = 0; i < E[LV].size(); ++i) {
-        W[LV](i) *= (1.0 - fermi(E[LV](i) - phi.s(), d::F_s));
+        W[LV](i) *= (1.0 - fermi(E[LV](i) - phi.s(), d::F_sc));
     }
     for (unsigned i = 0; i < E[RV].size(); ++i) {
-        W[RV](i) *= (1.0 - fermi(E[RV](i) - phi.d(), d::F_d));
+        W[RV](i) *= (1.0 - fermi(E[RV](i) - phi.d(), d::F_dc));
     }
     for (unsigned i = 0; i < E[LC].size(); ++i) {
-        W[LC](i) *= fermi(E[LC](i) - phi.s(), d::F_s);
+        W[LC](i) *= fermi(E[LC](i) - phi.s(), d::F_sc);
     }
     for (unsigned i = 0; i < E[RC].size(); ++i) {
-        W[RC](i) *= fermi(E[RC](i) - phi.d(), d::F_d);
+        W[RC](i) *= fermi(E[RC](i) - phi.d(), d::F_dc);
     }
 
     // scaling factor
