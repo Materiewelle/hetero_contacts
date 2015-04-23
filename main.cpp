@@ -20,15 +20,10 @@ int main() {
     _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
     _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
-//    steady_state s({0,0.7,0.8});
-//    s.solve<false>();
+    vec V_g, I;
+    steady_state::output({0, 0.3, -0.4}, 0.4, 400, V_g, I);
 
-//    plot_ldos(s.phi, 1000);
-
-    time_evolution te;
-    std::fill(begin(te.V), end(te.V), voltage{0, 0, 0});
-    te.solve();
-
+    plot(make_pair(V_g, I));
 
     return 0;
 }

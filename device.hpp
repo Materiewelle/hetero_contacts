@@ -16,16 +16,16 @@ namespace d {
     static constexpr double m_eff = 0.04 * c::m_e;                                 // effective mass
     static constexpr double E_gc  = 0.3;                                          // bandgap of contacts
     static constexpr double m_efc = 0.1 * c::m_e;                                 // effective mass of contacts
-    static constexpr double F_s   = -(E_g/2 + 0.0151);                            // Fermi level in source
+    static constexpr double F_s   = -(E_g/2 + 0.03);                            // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
-    static constexpr double F_d   = +(E_g/2 + 0.0151);                            // Fermi level in drain
+    static constexpr double F_d   = +(E_g/2 + 0.03);                            // Fermi level in drain
     static constexpr double F_sc  = F_s - 0.1;                                    // Fermi level in source contact
     static constexpr double F_dc  = F_d + 0.1;                                    // Fermi level in drain contact
 
     // geometry (everything in nm)
     static constexpr double l_sc  = 15;                                           // source contact length
     static constexpr double l_s   = 5;                                           // source length
-    static constexpr double l_g   = 9;                                           // gate length
+    static constexpr double l_g   = 15;                                           // gate length
     static constexpr double l_d   = 5;                                           // drain length
     static constexpr double l_dc  = 15;                                           // drain contact length
     static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length

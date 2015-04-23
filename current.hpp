@@ -48,19 +48,19 @@ current::current(const potential & phi)
     auto i_rc = linspace(phi.d() + 0.5 * d::E_gc, phi.d() + d::E_max, 50);
 
     lv.fill(integral<1>([&] (double E) {
-        return - scale * transmission(E) * (1.0 - fermi(E - phi.s(), d::F_s));
+        return - scale * transmission(E) * (1.0 - fermi(E - phi.s(), d::F_sc));
     }, i_lv, d::rel_tol, c::epsilon(1e-10), E_lv, W_lv));
 
     rv.fill(integral<1>([&] (double E) {
-        return scale * transmission(E) * (1.0 - fermi(E - phi.d(), d::F_d));
+        return scale * transmission(E) * (1.0 - fermi(E - phi.d(), d::F_dc));
     }, i_rv, d::rel_tol, c::epsilon(1e-10), E_rv, W_rv));
 
     lc.fill(integral<1>([&] (double E) {
-        return scale * transmission(E) * fermi(E - phi.s(), d::F_s);
+        return scale * transmission(E) * fermi(E - phi.s(), d::F_sc);
     }, i_lc, d::rel_tol, c::epsilon(1e-10), E_lc, W_lc));
 
     rc.fill(integral<1>([&] (double E) {
-        return - scale * transmission(E) * fermi(E - phi.d(), d::F_d);
+        return - scale * transmission(E) * fermi(E - phi.d(), d::F_dc);
     }, i_rc, d::rel_tol, c::epsilon(1e-10), E_rc, W_rc));
 
     if (phi.s() > phi.d() + d::E_gc) {
