@@ -27,7 +27,7 @@ namespace d {
     static constexpr double l_s   = 15;                                           // source length
     static constexpr double l_g   = 15;                                           // gate length
     static constexpr double l_d   = 15;                                           // drain length
-    static constexpr double l_dc  = 15;                                           // drain contactlength
+    static constexpr double l_dc  = 15;                                           // drain contact length
     static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length
     static constexpr double d_g   = 1.9;                                          // channel thickness
     static constexpr double d_o   = 1;                                            // oxide thickness
@@ -57,15 +57,14 @@ namespace d {
     static const arma::span d2    = arma::span( d.a * 2,  d.b * 2 + 1);           // drain area twice
     static const arma::span dc2   = arma::span(dc.a * 2, dc.b * 2 + 1);           // drain contact area twice
 
-    // hopping parameters
+    // hopping parameters central region
     static constexpr double t1    = 0.25 * E_g * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
     static constexpr double t2    = 0.25 * E_g * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_eff * E_g * c::e)));
 
-    // contacts
+    // hopping parameters contact region
     static constexpr double tc1   = 0.25 * E_gc * (1 + sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tc2   = 0.25 * E_gc * (1 - sqrt(1 + 2 * c::h_bar2 / (dx*dx * 1E-18 * m_efc * E_gc * c::e)));
     static constexpr double tcc   = 2.0 / (1.0 / t2 + 1.0 / tc2);
-    //static constexpr double tcn   = -0.1;
 
     // constant parts of hamiltonian
     inline arma::vec create_t_vec() {
@@ -103,7 +102,7 @@ namespace d {
 
         vec x0, x1, x2, x3, w0, w1, w2, w3;
 
-        // check if F_s - tcn or F_s + tcn!!
+        // valence band in contact region
         vec nvc = integral<2>([] (double E) {
             double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
             vec ret = arma::vec(2);
@@ -111,6 +110,8 @@ namespace d {
             ret(1) = (1 - fermi(E, F_dc)) * dos;
             return ret;
         }, linspace(E_min, -0.5 * E_gc, 100), rel_tol, c::epsilon(), x0, w0);
+
+        // conduction band in contact region
         vec ncc = integral<2>([] (double E) {
             double dos = E / sqrt(4*tc1*tc1*tc2*tc2 - (E*E - tc1*tc1 - tc2*tc2) * (E*E - tc1*tc1 - tc2*tc2));
             vec ret = arma::vec(2);
@@ -118,6 +119,8 @@ namespace d {
             ret(1) = fermi(E, F_dc) * dos;
             return ret;
         }, linspace(0.5 * E_gc, E_max, 100), rel_tol, c::epsilon(), x1, w1);
+
+        // valence band in central region
         vec nvsgd = integral<3>([] (double E) {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
@@ -126,6 +129,8 @@ namespace d {
             ret(2) = (1 - fermi(E, F_d)) * dos;
             return ret;
         }, linspace(E_min, - 0.5 * E_g, 100), rel_tol, c::epsilon(), x2, w2);
+
+        // conduction band in central region
         vec ncsgd = integral<3>([] (double E) {
             double dos = E / sqrt(4*t1*t1*t2*t2 - (E*E - t1*t1 - t2*t2) * (E*E - t1*t1 - t2*t2));
             vec ret = arma::vec(3);
@@ -135,7 +140,9 @@ namespace d {
             return ret;
         }, linspace(0.5 * E_g, E_max, 100), rel_tol, c::epsilon(), x3, w3);
 
+        // total charge density in contact regions
         vec nc = nvc + ncc;
+        // total charge density in central region
         vec nsgd = nvsgd + ncsgd;
 
         vec ret(N_x);
