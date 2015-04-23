@@ -76,8 +76,7 @@ void time_evolution::solve() {
 
     charge_density ntest;
     ntest.update(psi);
-    plot(n[0].data);
-    plot(ntest.data);
+    plot(vec((n[0].data - ntest.data)/n[0].data));
 
     // precalculate q-values
     calculate_q();
@@ -159,6 +158,7 @@ void time_evolution::solve() {
 
             // update n
             n[m].update(psi);
+            plot(vec((n[0].data - n[m].data)/n[0].data));
 
             // update potential
             auto dphi = phi[m].update(V[m], n[m], mr_neo);
@@ -226,8 +226,6 @@ void time_evolution::calculate_q() {
 
     // get q values dependent on potential in lead
     auto get_q = [&] (double phi0) {
-        phi0 += d::tcc; // denk an the energy shift
-
         // shortcuts
         static constexpr auto t1 = d::tc1;
         static constexpr auto t12 = t1 * t1;

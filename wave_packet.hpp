@@ -88,8 +88,8 @@ void wave_packet::init(const arma::vec & EE, const arma::vec & WW, const potenti
         in.d(i)  = G(G.size() - 1);
 
         // calculate first layer in the leads analytically
-        out.s(i) = ((E(i) - phi.s()) * G(           0) - d::t1 * G(           1)) / d::t2;
-        out.d(i) = ((E(i) - phi.d()) * G(G.size() - 1) - d::t1 * G(G.size() - 2)) / d::t2;
+        out.s(i) = ((E(i) - phi.s()) * in.s(i) - d::tc1 * G(           1)) / d::tc2;
+        out.d(i) = ((E(i) - phi.d()) * in.d(i) - d::tc1 * G(G.size() - 2)) / d::tc2;
     }
 }
 
