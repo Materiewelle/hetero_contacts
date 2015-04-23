@@ -52,7 +52,7 @@ void time_evolution::solve() {
 
     // solve steady state
     steady_state s(V[0]);
-    s.solve();
+    s.solve<false>();
 
     // save results
     I[0]   = s.I;
