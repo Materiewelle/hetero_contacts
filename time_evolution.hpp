@@ -13,7 +13,7 @@ class time_evolution {
 public:
     static constexpr auto dphi_threshold = 1e-8;
     static constexpr auto max_iterations = 50;
-    static constexpr auto tunnel_current_precision = 5e-4;
+    static constexpr auto tunnel_current_precision = 1e-3;
 
     std::vector<current> I;
     std::vector<potential> phi;

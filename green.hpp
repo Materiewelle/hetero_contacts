@@ -61,7 +61,7 @@ static inline arma::mat get_lDOS(const potential & phi, int N_grid, arma::vec & 
 
     E = linspace(phi_min - 0.5 * d::E_g - 0.2, phi_max + 0.5 * d::E_g + 0.2, N_grid);
 
-    //#pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < N_grid; ++i) {
         cx_double Sigma_s;
         cx_double Sigma_d;
@@ -116,13 +116,13 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
 
     unsigned N_s = std::round(d::N_sc + 0.5 * d::N_s);
     arma::vec fermi_l(N_s);
-    fermi_l.fill(d::F_s + phi.s());
+    fermi_l.fill(d::F_sc + phi.s());
     arma::vec x_l = d::x(arma::span(0, N_s-1));
     gp.add(x_l, fermi_l);
 
     unsigned N_d = std::round(d::N_dc + 0.5 * d::N_d);
     arma::vec fermi_r(N_d);
-    fermi_r.fill(d::F_d + phi.d());
+    fermi_r.fill(d::F_dc + phi.d());
     arma::vec x_r = d::x(arma::span(d::N_x-N_d, d::N_x-1));
     gp.add(x_r, fermi_r);
 
