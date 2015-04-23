@@ -85,8 +85,6 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 
     update_twice();
 
-    plot(f);
-
     // return dphi
     return max(abs(f));
 }

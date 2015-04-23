@@ -55,7 +55,7 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
     using namespace charge_density_impl;
 
     // get bound states
-    auto E_bound = get_bound_states(phi);
+    auto E_bound = vec(uword(0));//get_bound_states(phi);
 
     // get integration intervals
     auto get_intervals = [&] (double E_min, double E_max) {
