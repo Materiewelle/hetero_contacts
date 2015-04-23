@@ -1,5 +1,5 @@
 //#define ARMA_NO_DEBUG    // no bound checks
-//#define GNUPLOT_NOPLOTS
+#define GNUPLOT_NOPLOTS
 
 #include <iostream>
 #include <algorithm>
@@ -25,9 +25,15 @@ int main() {
 
 //    plot_ldos(s.phi, 1000);
 
-    time_evolution te;
-    std::fill(begin(te.V), end(te.V), voltage{0, 0, 0});
-    te.solve();
+    arma::vec I;
+    arma::vec V;
+    steady_state::output({0, 0.225, 0.2}, 0.5, 500, V, I);
+
+    plot(make_pair(V, I));
+
+//    time_evolution te;
+//    std::fill(begin(te.V), end(te.V), voltage{0, 0, 0});
+//    te.solve();
 
 
     return 0;
