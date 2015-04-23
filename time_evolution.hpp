@@ -197,13 +197,13 @@ void time_evolution::get_tunnel_energies(arma::vec & E, arma::vec & W) {
     double max = 0.0;
     double sgn = left ? 1.0 : -1.0;
     for (unsigned i = 0; i < V.size(); ++i) {
-        double delta = (V[i].d + d::F_d - V[i].s - d::F_s) * sgn - 0.96 * d::E_g;
+        double delta = (V[i].d + d::F_dc - V[i].s - d::F_sc) * sgn - 0.96 * d::E_gc;
         if (delta > max) {
             max = delta;
         }
     }
     if (max > 0) {
-        double E0 = (left ? (- V[0].s - d::F_s) : (- V[0].d - d::F_d)) - 0.48 * d::E_g;
+        double E0 = (left ? (- V[0].s - d::F_sc) : (- V[0].d - d::F_dc)) - 0.48 * d::E_gc;
         int N = std::round(max / tunnel_current_precision);
         E = arma::linspace(E0 - max, E0, N);
         W = arma::vec(N);
