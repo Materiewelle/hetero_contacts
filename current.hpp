@@ -75,7 +75,7 @@ current::current(const potential & phi)
 
         lt.fill(0.0);
         rt.fill(integral<1>([&] (double E) {
-            return scale * transmission(E);
+            return - scale * transmission(E);
         }, i_rt, d::rel_tol, c::epsilon(1e-10), E_rt, W_rt));
     } else {
         lt.fill(0.0);

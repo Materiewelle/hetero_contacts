@@ -26,14 +26,16 @@ int main() {
     s2.solve<false>();
     steady_state s_final({0,0.3,0.5});
     s_final.solve<false>();
+    steady_state s({0, 0.36, -1.0});
+    s.solve();
+    plot_ldos(s.phi, 1000);
 
-//    plot_ldos(s.phi, 1000);
+    s = steady_state({0, 0.36, 1.0});
+    s.solve();
+    plot_ldos(s.phi, 1000);
 
-//    arma::vec I;
-//    arma::vec V;
-//    steady_state::output({0, 0.225, 0.2}, 0.5, 500, V, I);
-
-//    plot(make_pair(V, I));
+    vec V_d, I;
+    steady_state::output({0, 0.36, -1.0}, 1.0, 4000, V_d, I);
 
     int slope_begin = 20;
     int slope_len = 30;
@@ -103,6 +105,7 @@ int main() {
 //    cout << "terc " << te.I[1].rc(0) << endl;
 //    cout << "telt " << te.I[1].lt(0) << endl;
 //    cout << "tert " << te.I[1].rt(0) << endl;
+
 
     return 0;
 }

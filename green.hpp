@@ -113,6 +113,7 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
 
     gp.add(d::x, vband);
     gp.add(d::x, cband);
+    gp.add(d::x, phi.data);
 
     unsigned N_s = std::round(d::N_sc + 0.5 * d::N_s);
     arma::vec fermi_l(N_s);
@@ -128,8 +129,9 @@ static void plot_ldos(const potential & phi, const unsigned N_grid) {
 
     gp << "set style line 1 lt 1 lc rgb RWTH_Orange lw 2\n";
     gp << "set style line 2 lt 1 lc rgb RWTH_Orange lw 2\n";
-    gp << "set style line 3 lc rgb RWTH_Schwarz lw 1 lt 3\n";
+    gp << "set style line 3 lt 1 lc rgb RWTH_Rot lw 2\n";
     gp << "set style line 4 lc rgb RWTH_Schwarz lw 1 lt 3\n";
+    gp << "set style line 5 lc rgb RWTH_Schwarz lw 1 lt 3\n";
 
     gp.plot();
 }

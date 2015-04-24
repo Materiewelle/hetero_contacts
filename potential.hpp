@@ -91,10 +91,10 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 
 void potential::smooth() {
     // smooth source region
-    smooth<(d::F_s > 0)>(0, d::N_sc + d::N_s * 0.2);
+    smooth<(d::F_s > 0)>(0, d::N_sc + d::N_s + d::N_g * 0.2);
 
     // smooth drain region
-    smooth<(d::F_d > 0)>(d::N_sc + d::N_s + d::N_g  + d::N_d * 0.8, d::N_x);
+    smooth<(d::F_d > 0)>(d::N_sc + d::N_s + d::N_g * 0.8, d::N_x);
 
     update_twice();
 }
