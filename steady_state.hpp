@@ -11,7 +11,7 @@
 
 class steady_state {
 public:
-    static constexpr auto dphi_threshold = 1e-15;
+    static constexpr auto dphi_threshold = 1e-3;
     static constexpr auto max_iterations = 250;
 
     voltage V;
@@ -94,7 +94,7 @@ void steady_state::output(const voltage & V0, double V_d1, int N, arma::vec & V_
     I = arma::vec(N);
 
     steady_state s(V0);
-    bool conv = s.solve<false>();
+    bool conv = s.solve();
     I(0) = s.I.total(0);
 
     for (int i = 1; i < N; ++i) {
@@ -104,7 +104,7 @@ void steady_state::output(const voltage & V0, double V_d1, int N, arma::vec & V_
             conv = s.solve<false>();
         } else {
             s = steady_state(V);
-            conv = s.solve<false>();
+            conv = s.solve();
         }
         I(i) = s.I.total(0);
     }
@@ -115,7 +115,7 @@ void steady_state::transfer(const voltage & V0, double V_g1, int N, arma::vec & 
     I = arma::vec(N);
 
     steady_state s(V0);
-    bool conv = s.solve<false>();
+    bool conv = s.solve();
     I(0) = s.I.total(0);
 
     for (int i = 0; i < N; ++i) {
@@ -125,7 +125,7 @@ void steady_state::transfer(const voltage & V0, double V_g1, int N, arma::vec & 
             conv = s.solve<false>();
         } else {
             s = steady_state(V);
-            conv = s.solve<false>();
+            conv = s.solve();
         }
         I(i) = s.I.total(0);
     }

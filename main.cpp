@@ -20,23 +20,18 @@ int main() {
     _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
     _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
-//    steady_state s({0,0.7,0.8});
-//    s.solve<false>();
+    steady_state s({0, 0.36, -1.0});
+    s.solve();
+    plot_ldos(s.phi, 1000);
 
-//    plot_ldos(s.phi, 1000);
+    s = steady_state({0, 0.36, 1.0});
+    s.solve();
+    plot_ldos(s.phi, 1000);
 
-//    arma::vec I;
-//    arma::vec V;
-//    steady_state::output({0, 0.225, 0.2}, 0.5, 500, V, I);
+    vec V_d, I;
+    steady_state::output({0, 0.36, -1.0}, 1.0, 4000, V_d, I);
 
-//    plot(make_pair(V, I));
-
-    time_evolution te;
-    std::fill(begin(te.V), end(te.V), voltage{0, .3, .4});
-    te.solve();
-
-    plot(te.I[0].total);
-    plot(te.I[1].total);
+    plot(make_pair(V_d, I));
 
     return 0;
 }
