@@ -19,8 +19,8 @@ namespace d {
     static constexpr double F_s   = +(E_g/2 + 0.03);                              // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.03);                              // Fermi level in drain
-    static constexpr double F_sc  = F_s - 0.1;                                   // Fermi level in source contact
-    static constexpr double F_dc  = F_d - 0.1;                                   // Fermi level in drain contact
+    static constexpr double F_sc  = F_s - 0.05;                                   // Fermi level in source contact
+    static constexpr double F_dc  = F_d - 0.05;                                   // Fermi level in drain contact
 
     // geometry (everything in nm)
     static constexpr double l_sc  = 5;                                           // source contact length
