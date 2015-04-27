@@ -81,7 +81,7 @@ static inline arma::mat get_lDOS(const potential & phi, int N_grid, arma::vec & 
     return ret;
 }
 
-static void plot_ldos(const potential & phi, const unsigned N_grid) {
+static inline void plot_ldos(const potential & phi, const unsigned N_grid) {
     gnuplot gp;
 
     gp << "set title \"Logarithmic lDOS\"\n";
