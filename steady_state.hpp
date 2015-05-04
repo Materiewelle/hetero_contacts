@@ -11,8 +11,8 @@
 
 class steady_state {
 public:
-    static constexpr auto dphi_threshold = 1e-3;
-    static constexpr auto max_iterations = 250;
+    static constexpr auto dphi_threshold = 1e-5;
+    static constexpr auto max_iterations = 40;
 
     voltage V;
     charge_density n;
@@ -63,6 +63,7 @@ bool steady_state::solve() {
 
         cout << V.s << ", " << V.g << ", " << V.d;
         cout << ": iteration " << it << ": rel deviation is " << dphi/dphi_threshold << endl;
+
 
         // check if dphi is small enough
         if (dphi < dphi_threshold) {

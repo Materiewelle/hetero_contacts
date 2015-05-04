@@ -20,73 +20,87 @@ int main() {
     _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
     _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
-    steady_state s1({0,0.3,0.0});
-    s1.solve<false>();
-    steady_state s2({0,0,0.5});
-    s2.solve<false>();
-    steady_state s_final({0,0.3,0.5});
-    s_final.solve<false>();
-    steady_state s({0, 0.36, -1.0});
-    s.solve();
-    plot_ldos(s.phi, 1000);
+//    steady_state s1({0,0.3,0.0});
+//    s1.solve<false>();
+//    steady_state s2({0,0,0.5});
+//    s2.solve<false>();
+//    steady_state s_final({0,0.3,0.5});
+//    s_final.solve<false>();
+//    steady_state s({0, 0.36, -1.0});
+//    s.solve();
+//    plot_ldos(s.phi, 1000);
 
-    s = steady_state({0, 0.36, 1.0});
-    s.solve();
-    plot_ldos(s.phi, 1000);
+//    cout << d::lam_g;
+//    cout << d::t_vec << std::endl;
+//      steady_state s = steady_state({0, 0., 0.5});
+//      s.solve();
+//      plot_ldos(s.phi, 1000);
+//    cout << s.I.total;
 
-    vec V_d, I;
-    steady_state::output({0, 0.36, -1.0}, 1.0, 4000, V_d, I);
+//    plot_ldos(s.phi, 1000);
 
-    int slope_begin = 20;
-    int slope_len = 30;
+    vec V_g, I;
+    steady_state::transfer({0, -.6, .4}, 1.2, 600, V_g, I);
 
-    time_evolution te1;
-    time_evolution te2;
-    std::fill(begin(te1.V), begin(te1.V) + slope_begin - 1, voltage{0, .3, 0});
-    std::fill(begin(te2.V), begin(te2.V) + slope_begin - 1, voltage{0, 0, .5});
-    vec slope1 = linspace(0, 0.5, slope_len);
-    vec slope2 = linspace(0, 0.3, slope_len);
-    for (int i = 0; i < slope_len; ++i) {
-        te1.V[slope_begin+i].d = slope1(i);
-        te2.V[slope_begin+i].g = slope2(i);
-    }
-    std::fill(begin(te1.V) + slope_begin + slope_len, end(te1.V), voltage{0, .3, .5});
-    std::fill(begin(te2.V) + slope_begin + slope_len, end(te2.V), voltage{0, .3, .5});
+    mat data = join_horiz(V_g, I);
+    data.save("/home/fabian/Kram/data4", csv_ascii);
 
-    te1.solve();
-    te2.solve();
+//    gnuplot g;
+//    g << "set logscale y\n";
+//    g << "set format y \"%e\"\n";
+//    g.add(make_pair(V_g, I));
+//    g.plot();
 
-    vec I_t1(t::N_t);
-    vec I_t2(t::N_t);
-    for (int i = 0; i < t::N_t; ++i) {
-        I_t1(i) = te1.I[i].total(d::N_x-1);
-        I_t2(i) = te2.I[i].total(d::N_x-1);
-    }
+//    int slope_begin = 20;
+//    int slope_len = 30;
 
-    vec I_sfinal(t::N_t);
-    I_sfinal.fill(s_final.I.total(0));
+//    time_evolution te1;
+//    time_evolution te2;
+//    std::fill(begin(te1.V), begin(te1.V) + slope_begin - 1, voltage{0, .3, 0});
+//    std::fill(begin(te2.V), begin(te2.V) + slope_begin - 1, voltage{0, 0, .5});
+//    vec slope1 = linspace(0, 0.5, slope_len);
+//    vec slope2 = linspace(0, 0.3, slope_len);
+//    for (int i = 0; i < slope_len; ++i) {
+//        te1.V[slope_begin+i].d = slope1(i);
+//        te2.V[slope_begin+i].g = slope2(i);
+//    }
+//    std::fill(begin(te1.V) + slope_begin + slope_len, end(te1.V), voltage{0, .3, .5});
+//    std::fill(begin(te2.V) + slope_begin + slope_len, end(te2.V), voltage{0, .3, .5});
 
-    gnuplot gp1;
-    gp1 << "set title \"transition Vd=0 -> Vd=0.5V\"\n";
-    gp1 << "set terminal pdf rounded color enhanced font 'arial,12'\n";
-    gp1 << "set output 'transition_drain.pdf'\n";
-    vec I_s1(t::N_t);
-    I_s1.fill(s1.I.total(0));
-    gp1.add(I_s1);
-    gp1.add(I_sfinal);
-    gp1.add(I_t1);
-    gp1.plot();
+//    te1.solve();
+//    te2.solve();
 
-    gnuplot gp2;
-    gp2 << "set title \"transition Vg=0 -> Vg=0.3V\"\n";
-    gp2 << "set terminal pdf rounded color enhanced font 'arial,12'\n";
-    gp2 << "set output 'transition_gate.pdf'\n";
-    vec I_s2(t::N_t);
-    I_s2.fill(s2.I.total(0));
-    gp2.add(I_s2);
-    gp2.add(I_sfinal);
-    gp2.add(I_t2);
-    gp2.plot();
+//    vec I_t1(t::N_t);
+//    vec I_t2(t::N_t);
+//    for (int i = 0; i < t::N_t; ++i) {
+//        I_t1(i) = te1.I[i].total(d::N_x-1);
+//        I_t2(i) = te2.I[i].total(d::N_x-1);
+//    }
+
+//    vec I_sfinal(t::N_t);
+//    I_sfinal.fill(s_final.I.total(0));
+
+//    gnuplot gp1;
+//    gp1 << "set title \"transition Vd=0 -> Vd=0.5V\"\n";
+//    gp1 << "set terminal pdf rounded color enhanced font 'arial,12'\n";
+//    gp1 << "set output 'transition_drain.pdf'\n";
+//    vec I_s1(t::N_t);
+//    I_s1.fill(s1.I.total(0));
+//    gp1.add(I_s1);
+//    gp1.add(I_sfinal);
+//    gp1.add(I_t1);
+//    gp1.plot();
+
+//    gnuplot gp2;
+//    gp2 << "set title \"transition Vg=0 -> Vg=0.3V\"\n";
+//    gp2 << "set terminal pdf rounded color enhanced font 'arial,12'\n";
+//    gp2 << "set output 'transition_gate.pdf'\n";
+//    vec I_s2(t::N_t);
+//    I_s2.fill(s2.I.total(0));
+//    gp2.add(I_s2);
+//    gp2.add(I_sfinal);
+//    gp2.add(I_t2);
+//    gp2.plot();
 
 
 //    plot(te.I[0].total);

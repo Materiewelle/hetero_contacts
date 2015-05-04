@@ -2,6 +2,7 @@
 #define CHARGE_DENSITY_HPP
 
 #include <armadillo>
+#include <stack>
 
 // forward declarations
 #ifndef POTENTIAL_HPP
@@ -13,7 +14,7 @@ class wave_packet;
 
 class charge_density {
 public:
-    static constexpr int initial_waypoints = 10;
+    static constexpr int initial_waypoints = 60;
     arma::vec data;
 
     inline charge_density();
@@ -30,13 +31,16 @@ public:
 #include "integral.hpp"
 #include "potential.hpp"
 #include "wave_packet.hpp"
+#include "gnuplot.hpp"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 namespace charge_density_impl {
 
     static inline arma::vec get_bound_states(const potential & phi);
-    static inline arma::vec get_bound_states_interval(const potential & phi, double E_min, double E_max);
+    static inline arma::vec get_bound_states(const potential & phi, double E0, double E1);
+    template<bool zero_check = true>
+    static inline int eval(const arma::vec & a, const arma::vec & a2, const arma::vec & b, double E);
 
     template<bool source>
     static inline arma::vec get_A(const potential & phi, double E);
@@ -55,7 +59,12 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
     using namespace charge_density_impl;
 
     // get bound states
-    auto E_bound = vec(uword(0));//get_bound_states(phi);
+//    auto E_bound = vec(uword(0));
+
+    auto E_bound = get_bound_states(phi);
+
+//    std::cout << E_bound << std::endl;
+//    plot_ldos(phi, 1000);
 
     // get integration intervals
     auto get_intervals = [&] (double E_min, double E_max) {
@@ -132,6 +141,7 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
 
     // scaling and doping
     data = (n_sv + n_sc + n_dv + n_dc) * scale + d::n0;
+//    plot(data);
 }
 
 void charge_density::update(const wave_packet psi[4]) {
@@ -169,7 +179,7 @@ arma::vec charge_density_impl::get_bound_states(const potential & phi) {
     phi2 = arma::min(phi.data(d::d)) - 0.5 * d::E_g;
     limit = phi0 > phi2 ? phi0 : phi2;
     if (limit < phi1) {
-        return get_bound_states_interval(phi, limit, phi1);
+        return get_bound_states(phi, limit, phi1);
     }
 
     // check for bound states in conduction band
@@ -178,71 +188,127 @@ arma::vec charge_density_impl::get_bound_states(const potential & phi) {
     phi2 = arma::max(phi.data(d::d)) + 0.5 * d::E_g;
     limit = phi0 < phi2 ? phi0 : phi2;
     if (limit > phi1) {
-        return get_bound_states_interval(phi, phi1, limit);
+        return get_bound_states(phi, phi1, limit);
     }
 
     return arma::vec(arma::uword(0));
 }
 
-arma::vec charge_density_impl::get_bound_states_interval(const potential & phi, double E_min, double E_max) {
+arma::vec charge_density_impl::get_bound_states(const potential & phi, double E0, double E1) {
     using namespace arma;
 
-    // return vector
-    vec E_bound;
+    static constexpr double tol = 1e-10;
 
-    // number of eigenvalues per step
-    static constexpr int N = 20;
+    span range{d::s2.a, d::d2.b};
+    vec a = d::t_vec(range);
+    vec a2 = a % a;
+    vec b = phi.twice(range);
 
-    // build the hamiltonian (without contacts)
-    mat H = mat(d::N_x * 2, d::N_x * 2);
-    H.fill(0);
-    H.diag(-1) = d::t_vec;
-    H.diag(+1) = d::t_vec;
+    double E2;
+    int i0, i1;
+    int s0, s1, s2;
 
-    auto E_mid = E_min;
+    s0 = eval(a, a2, b, E0);
+    s1 = eval(a, a2, b, E1);
 
-    while (true) {
-        // eigenstates and -energies
-        vec E;
-        mat psi;
+    // check if no bound states in this interval
+    if (s1 - s0 == 0) {
+        return vec(uword(0));
+    }
 
-        // prepare hamiltonian so that eigenvalues near E_mid are searched
-        H.diag(+0) = phi.twice - E_mid;
+    unsigned n = 2;
+    vec E = vec(1025);
+    ivec s = ivec(1025);
+    E(0) = E0;
+    E(1) = E1;
+    s(0) = s0;
+    s(1) = s1;
 
-        // get eigenstates and -energies (sparse matrix created on the fly, probably inefficient)
-        eigs_sym(E, psi, sp_mat(H), N, "sm"); // check if (always) sorted
+    unsigned n_bound = 0;
+    vec E_bound(100);
 
-        // reverse subtraction of E_mid
-        E += E_mid;
+    // stack for recursion
+    std::stack<std::pair<int, int>> stack;
 
-        vec E2 = vec(E.size());
-        unsigned N_E2 = 0;
-        for (unsigned i = 0; i < E.size(); ++i) {
-            // check if inside region of interest
-            if ((E(i) > E_min) && (E(i) < E_max)) {
-                // manual norm² since armadillo sucks
-                double loc = 0;
-                for (unsigned j = d::N_s; j < d::N_s + d::N_g; ++j) {
-                    loc += psi(j, i) * psi(j, i);
-                }
+    // push first interval to stack
+    stack.push(std::make_pair(0, 1));
 
-                // check if localized in the channel (more than sqrt(50%))
-                if (loc >= 0.5) {
-                    E2(N_E2++) = E(i);
-                }
+    // repeat until all intervals inspected
+    while (!stack.empty()) {
+        const auto & i = stack.top();
+        i0 = i.first;
+        i1 = i.second;
+
+        stack.pop();
+
+        // load data
+        E0 = E(i0);
+        E1 = E(i1);
+        s0 = s(i0);
+        s1 = s(i1);
+
+        // mid energy
+        E2 = 0.5 * (E0 + E1);
+
+        // if interval size sufficiently small enough, add new bound state
+        if (E1 - E0 <= tol) {
+            if (E_bound.size() <= n_bound) {
+                E_bound.resize(n_bound * 2);
             }
-        }
-
-        if (N_E2 == 0) {
-            sort(E_bound);
-            return E_bound;
+            E_bound(n_bound++) = E2;
         } else {
-            E2.resize(N_E2);
-            E_bound = join_vert(E_bound, E2);
-            E_mid = max(E2) + 0.4 * (max(E2) - min(E2));
-            E_min = max(E2);
+            // evaluate s at mid energy
+            s2 = eval(a, a2, b, E2);
+
+            // add intervals to stack if they contain bound states
+            if (s1 - s2 > 0) {
+                stack.push(std::make_pair(n, i1));
+            }
+            if (s2 - s0 > 0) {
+                stack.push(std::make_pair(i0, n));
+            }
+
+            // save E2 and s2
+            if (E.size() <= n) {
+                E.resize(2 * n - 1);
+                s.resize(2 * n - 1);
+            }
+            E(n) = E2;
+            s(n) = s2;
+            ++n;
         }
     }
+
+    E_bound.resize(n_bound);
+    return E_bound;
+}
+
+template<bool zero_check = true>
+int charge_density_impl::eval(const arma::vec & a, const arma::vec & a2, const arma::vec & b, double E) {
+    int n = b.size();
+
+    static const double eps = c::epsilon();
+
+    // first iteration (i = 0)
+    double q;
+    double q0 = b[0] - E;
+    int s = q0 < 0 ? 1 : 0;
+
+    // start with i = 1
+    for (int i = 1; i < n; ++i) {
+        if (zero_check && (q0 == 0)) {
+            q = b[i] - E - a[i - 1] / eps;
+        } else {
+            q = b[i] - E - a2[i - 1] / q0;
+        }
+
+        q0 = q;
+        if (q < 0) {
+            ++s;
+        }
+    }
+
+    return s;
 }
 
 template<bool source>
