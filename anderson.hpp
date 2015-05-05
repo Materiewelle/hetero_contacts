@@ -40,26 +40,32 @@ void anderson::update(arma::vec & v, const arma::vec & f) {
 
         v += f * beta;
     } else {
+        // update the history matrices
         K = join_horiz(K, v - v_old);
         D = join_horiz(D, f - f_old);
 
-        while (D.n_cols > N) {
-            K = K({0, K.n_rows - 1}, {1, K.n_cols - 1});
-            D = D({0, D.n_rows - 1}, {1, D.n_cols - 1});
+        // cut the matrices to desired maximum length
+        if (D.n_cols > N) {
+            K = K.cols(1 , K.n_cols - 1);
+            D = D.cols(1 , D.n_cols - 1);
         }
 
+        // temporary variable
         mat I = D.t() * D;
 
+        // check if I's condition number is to large, i.e. I^-1 close to singular
         while ((cond(I) > 1e16) && (D.n_cols > 1)) {
-            K = K({0, K.n_rows - 1}, {1, K.n_cols - 1});
-            D = D({0, D.n_rows - 1}, {1, D.n_cols - 1});
+            // in that case, cut older values until it works again
+            K = K.cols(1, K.n_cols - 1);
+            D = D.cols(1, D.n_cols - 1);
             I = D.t() * D;
         }
 
         v_old = v;
         f_old = f;
 
-        v += f * beta - (K + D * beta) * inv(I) * D.t() * f;
+        // substract the anderson-mixing term
+        v += f * beta - (K + D * beta) * arma::solve(I, D.t()) * f;
     }
 
     ++updates;
