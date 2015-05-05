@@ -6,8 +6,8 @@
 
 class anderson {
 public:
-    static constexpr auto beta = 0.2;
-    static constexpr auto N = 6;
+    static constexpr auto beta = 0.1;
+    static constexpr auto N = 4;
 
     inline anderson();
     inline anderson(const arma::vec & v);

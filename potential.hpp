@@ -80,10 +80,10 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 
     vec f = poisson(V, n) - data;
 
-    static int asdf = 0;
-    if ((asdf++) % 10 == 0) {
-        plot(data, f);
-    }
+//    static int asdf = 0;
+//    if ((asdf++) % 20 == 0) {
+//        plot(data, f);
+//    }
 
     // anderson mixing
     mr_neo.update(data, f);
