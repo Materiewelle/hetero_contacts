@@ -69,7 +69,6 @@ static const std::string rwth_plt =
     "RWTH_Lila_50     = '#BCB5D7'\n"
     "RWTH_Lila_25     = '#DEDAEB'\n"
     "RWTH_Lila_10     = '#F2F0F7'\n"
-    "set terminal wxt rounded enhanced font 'arial,12'\n"
     "set style line 444 lc '#9C9E9F' lt 1 lw 2\n"
     "set border 3 ls 444\n"
     "set tics nomirror\n"

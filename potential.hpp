@@ -80,6 +80,11 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 
     vec f = poisson(V, n) - data;
 
+    static int asdf = 0;
+    if ((asdf++) % 10 == 0) {
+        plot(data, f);
+    }
+
     // anderson mixing
     mr_neo.update(data, f);
 
@@ -90,11 +95,15 @@ double potential::update(const voltage & V, const charge_density & n, anderson &
 }
 
 void potential::smooth() {
+    smooth<(d::F_s > 0)>(0, d::N_sc * 0.3);
+
     // smooth source region
     smooth<(d::F_s > 0)>(d::N_sc + 0.3 * d::N_s, d::N_sc + d::N_s + d::N_g * 0.05);
 
     // smooth drain region
     smooth<(d::F_d > 0)>(d::N_sc + d::N_s + d::N_g * 0.95, d::N_x - (d::N_dc + 0.3 * d::N_d));
+
+    smooth<(d::F_d > 0)>(d::N_x - 0.3 * d::N_dc, d::N_x);
 
     update_twice();
 }

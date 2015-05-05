@@ -2,11 +2,12 @@
 #define ANDERSON_HPP
 
 #include <armadillo>
+#include "gnuplot.hpp"
 
 class anderson {
 public:
-    static constexpr auto beta = 0.6;
-    static constexpr auto N = 30;
+    static constexpr auto beta = 0.2;
+    static constexpr auto N = 6;
 
     inline anderson();
     inline anderson(const arma::vec & v);
@@ -58,7 +59,7 @@ void anderson::update(arma::vec & v, const arma::vec & f) {
         v_old = v;
         f_old = f;
 
-        v += f * beta - (K + D * beta) * I * D.t() * f;
+        v += f * beta - (K + D * beta) * inv(I) * D.t() * f;
     }
 
     ++updates;

@@ -14,8 +14,8 @@ namespace d {
     static constexpr double eps_o = 25;                                           // relative permittivity of oxide
     static constexpr double E_g   = 0.62;                                         // bandgap
     static constexpr double m_eff = 0.04 * c::m_e;                                // effective mass
-    static constexpr double E_gc  = 0.3;                                          // bandgap of contacts
-    static constexpr double m_efc = 0.1 * c::m_e;                                 // effective mass of contacts
+    static constexpr double E_gc  = E_g;//0.3;                                          // bandgap of contacts
+    static constexpr double m_efc = m_eff;//0.1 * c::m_e;                                 // effective mass of contacts
     static constexpr double F_s   = +(E_g/2 + 0.011);                              // Fermi level in source
     static constexpr double F_g   = 0;                                            // Fermi level in gate
     static constexpr double F_d   = +(E_g/2 + 0.011);                              // Fermi level in drain
@@ -30,10 +30,10 @@ namespace d {
     static constexpr double l_dc  = 15;                                           // drain contact length
     static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length
     static constexpr double d_g   = 1.3;                                          // channel thickness
-    static constexpr double d_o   = 0.8;                                            // oxide thickness
-    static constexpr double lam_g = sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
-    static constexpr double lam_s = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
-    static constexpr double lam_d = 1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
+    static constexpr double d_o   = 4;                                            // oxide thickness
+    static constexpr double lam_g = 2;//sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
+    static constexpr double lam_s = 2;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
+    static constexpr double lam_d = 2;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
 
     // lattice
     static constexpr double dx    = 0.1;                                          // lattice constant

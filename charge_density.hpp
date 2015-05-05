@@ -14,7 +14,7 @@ class wave_packet;
 
 class charge_density {
 public:
-    static constexpr int initial_waypoints = 60;
+    static constexpr int initial_waypoints = 100;
     arma::vec data;
 
     inline charge_density();
@@ -58,13 +58,7 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
     using namespace arma;
     using namespace charge_density_impl;
 
-    // get bound states
-//    auto E_bound = vec(uword(0));
-
     auto E_bound = get_bound_states(phi);
-
-//    std::cout << E_bound << std::endl;
-//    plot_ldos(phi, 1000);
 
     // get integration intervals
     auto get_intervals = [&] (double E_min, double E_max) {
@@ -111,16 +105,16 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
     // calculate charge density
     auto n_sv = integral<d::N_x>([&] (double E) -> vec {
         return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_sc) - 1);
-    }, i_sv, d::rel_tol, c::epsilon(1), E[LV], W[LV]);
+    }, i_sv, d::rel_tol, c::epsilon(), E[LV], W[LV]);
     auto n_dv = integral<d::N_x>([&] (double E) -> vec {
         return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_dc) - 1);
-    }, i_dv, d::rel_tol, c::epsilon(1), E[RV], W[RV]);
+    }, i_dv, d::rel_tol, c::epsilon(), E[RV], W[RV]);
     auto n_sc = integral<d::N_x>([&] (double E) -> vec {
         return get_A<true>(phi, E) * (fermi(E - phi.s(), d::F_sc));
-    }, i_sc, d::rel_tol, c::epsilon(1), E[LC], W[LC]);
+    }, i_sc, d::rel_tol, c::epsilon(), E[LC], W[LC]);
     auto n_dc = integral<d::N_x>([&] (double E) -> vec {
         return get_A<false>(phi, E) * (fermi(E - phi.d(), d::F_dc));
-    }, i_dc, d::rel_tol, c::epsilon(1), E[RC], W[RC]);
+    }, i_dc, d::rel_tol, c::epsilon(), E[RC], W[RC]);
 
     // multiply weights with fermi function
     for (unsigned i = 0; i < E[LV].size(); ++i) {
@@ -141,7 +135,6 @@ void charge_density::update(const potential & phi, arma::vec E[4], arma::vec W[4
 
     // scaling and doping
     data = (n_sv + n_sc + n_dv + n_dc) * scale + d::n0;
-//    plot(data);
 }
 
 void charge_density::update(const wave_packet psi[4]) {
