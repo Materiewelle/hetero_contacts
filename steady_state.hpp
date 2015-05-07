@@ -61,8 +61,8 @@ bool steady_state::solve() {
         // update potential
         dphi = phi.update(V, n, mr_neo);
 
-        cout << V.s << ", " << V.g << ", " << V.d;
-        cout << ": iteration " << it << ": rel deviation is " << dphi/dphi_threshold << endl;
+        //cout << V.s << ", " << V.g << ", " << V.d;
+        //cout << ": iteration " << it << ": rel deviation is " << dphi/dphi_threshold << endl;
 
 
         // check if dphi is small enough
@@ -81,13 +81,18 @@ bool steady_state::solve() {
     // get current
     I = current(phi);
 
+    bool converged = !(dphi > dphi_threshold);
+    cout << V.s << ", " << V.g << ", " << V.d;
+    cout << ": " << it << " iterations, final deviation " << dphi/dphi_threshold << ", converged? " << converged << "!" << endl;
+    return converged;
+
     // check if actually converged
-    if (dphi > dphi_threshold) {
-        cout << "Warning: steady_state::solve did not converge after " << it << " iterations!" << endl;
-        return false;
-    } else {
-        return true;
-    }
+    //if (!converged) {
+        //cout << "Warning: steady_state::solve did not converge after " << it << " iterations!" << endl;
+    //    return false;
+    //} else {
+    //    return true;
+    //}
 }
 
 void steady_state::output(const voltage & V0, double V_d1, int N, arma::vec & V_d, arma::vec & I) {

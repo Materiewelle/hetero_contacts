@@ -25,9 +25,9 @@ int main() {
 //    plot_ldos(s.phi, 1000);
 
     vec V_g, I;
-    steady_state::transfer({0, .5, .4}, -.2, 3000, V_g, I);
+    steady_state::transfer({0, .5, .4}, .2, 3000, V_g, I);
     mat data = join_horiz(V_g, I);
-    data.save("/home/fabian/Kram/data6", csv_ascii);
+    data.save("transfer_result", csv_ascii);
 
     return 0;
 }
