@@ -31,9 +31,9 @@ namespace d {
     static constexpr double l     = l_sc + l_s + l_g + l_d + l_dc;                // device length
     static constexpr double d_g   = 1.3;                                          // channel thickness
     static constexpr double d_o   = 1;                                            // oxide thickness
-    double lam_g = 1.6;//sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
-    double lam_s = 1.9;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
-    double lam_d = 1.9;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
+    static constexpr double lam_g = 2.0;//sqrt(eps_g*d_g*d_g/8/eps_o*log(1+2*d_o/d_g)); // scr. length in channel
+    static constexpr double lam_s = 1.9;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in source
+    static constexpr double lam_d = 1.9;//1.0 < lam_g ? 1.0 : lam_g;                    // scr. length in drain
 
     // lattice
     static constexpr double dx    = 0.1;                                          // lattice constant

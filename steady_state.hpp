@@ -11,8 +11,8 @@
 
 class steady_state {
 public:
-    static constexpr auto dphi_threshold = 1e-4;
-    static constexpr auto max_iterations = 60;
+    static constexpr auto dphi_threshold = 1e-8;
+    static constexpr auto max_iterations = 120;
 
     voltage V;
     charge_density n;
@@ -28,6 +28,7 @@ public:
     inline bool solve();
 
     static inline void output(const voltage & V0, double V_d1, int N, arma::vec & V_d, arma::vec & I);
+    template<bool reuse=true>
     static inline void transfer(const voltage & V0, double V_g1, int N, arma::vec & V_g, arma::vec & I);
 };
 
@@ -117,13 +118,13 @@ void steady_state::output(const voltage & V0, double V_d1, int N, arma::vec & V_
     }
 }
 
+template<bool reuse>
 void steady_state::transfer(const voltage & V0, double V_g1, int N, arma::vec & V_g, arma::vec & I) {
     V_g = arma::linspace(V0.g, V_g1, N);
     I = arma::vec(N);
 
     steady_state s(V0);
-    bool conv = s.solve();
-    I(0) = s.I.total(0);
+    bool conv = false;
 
 //    int diverged = 0;
 //    int max_div = 3;
@@ -131,15 +132,19 @@ void steady_state::transfer(const voltage & V0, double V_g1, int N, arma::vec & 
     for (int i = 0; i < N; ++i) {
         std::cout << "Step " << i+1 << "/" << N << ": V_g=" << V_g(i) << ": ";
         voltage V = { V0.s, V_g(i), V0.d };
-        if (false) {
+        if (reuse && conv) {
             s = steady_state(V, s.phi);
             conv = s.solve<false>();
+            if (!conv) {
+                s = steady_state(V);
+                conv = s.solve();
+            }
         } else {
 //            if(++diverged >= max_div) {
 //                break;
 //            }
-        s = steady_state(V);
-        conv = s.solve();
+            s = steady_state(V);
+            conv = s.solve();
         }
         I(i) = s.I.total(0);
     }
