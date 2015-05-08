@@ -11,8 +11,8 @@
 
 class steady_state {
 public:
-    static constexpr auto dphi_threshold = 1e-8;
-    static constexpr auto max_iterations = 100;
+    static constexpr auto dphi_threshold = 1e-4;
+    static constexpr auto max_iterations = 60;
 
     voltage V;
     charge_density n;
@@ -82,8 +82,9 @@ bool steady_state::solve() {
     I = current(phi);
 
     bool converged = !(dphi > dphi_threshold);
-    cout << V.s << ", " << V.g << ", " << V.d;
-    cout << ": " << it << " iterations, final deviation " << dphi/dphi_threshold << ", converged? " << converged << "!" << endl;
+//    cout << V.s << ", " << V.g << ", " << V.d;
+    string conv_text = converged ? "converged!" : "DIVERGED!!!";
+    cout << it << " iterations, reldev=" << dphi/dphi_threshold << ", " << conv_text << endl;
     return converged;
 
     // check if actually converged
@@ -124,14 +125,21 @@ void steady_state::transfer(const voltage & V0, double V_g1, int N, arma::vec & 
     bool conv = s.solve();
     I(0) = s.I.total(0);
 
+//    int diverged = 0;
+//    int max_div = 3;
+
     for (int i = 0; i < N; ++i) {
+        std::cout << "Step " << i+1 << "/" << N << ": V_g=" << V_g(i) << ": ";
         voltage V = { V0.s, V_g(i), V0.d };
-        if (conv) {
+        if (false) {
             s = steady_state(V, s.phi);
             conv = s.solve<false>();
         } else {
-            s = steady_state(V);
-            conv = s.solve();
+//            if(++diverged >= max_div) {
+//                break;
+//            }
+        s = steady_state(V);
+        conv = s.solve();
         }
         I(i) = s.I.total(0);
     }
